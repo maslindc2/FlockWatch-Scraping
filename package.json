@@ -5,7 +5,7 @@
   "scripts": {
     "test": "jest --coverage",
     "dev": "nodemon ./src/server.ts",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
   },
   "repository": {
