@@ -2,18 +2,21 @@ import path from "path";
 import { ReadCSV } from "../utils/csv-parser/read-csv";
 import { CSVParser } from "../utils/csv-parser/csv-parser";
 import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/flock-cases-by-state-transformer";
+import { IFlockCasesTransformed } from "../interfaces/i-flock-cases-transformed";
 import { logger } from "../utils/winston-logger";
 
 class DataProcessor {
     public async processData() {
         try {
-            const csvFilePath = path.resolve(
+            const csvFilePath: string = path.resolve(
                 __dirname,
                 "../../data/Map Comparisons.csv"
             );
             logger.silly(`Parsing CSV File at ${csvFilePath}`);
-            const csvData = ReadCSV.readCSVFile(csvFilePath, "utf-16le")
-            const customHeaders = [
+
+            const csvData: string = ReadCSV.readCSVFile(csvFilePath, "utf-16le")
+            
+            const customHeaders: string[] = [
                 "State Abbreviation",
                 "State Name",
                 "Backyard Flocks",
@@ -27,9 +30,15 @@ class DataProcessor {
                 "Latitude (generated)",
                 "Longitude (generated)"
             ];
-            const parsedData = CSVParser.parseCSV(csvData, "\t", 2, customHeaders)
-            const dataFiltered = parsedData.filter((row: { [x: string]: string }) => row["State Name"]?.trim() && row["Birds Affected"] !== "0");
-            const transformedData = FlockCasesByStateTransformer.transformData(dataFiltered);
+            
+            const parsedData: Record<string, string> [] = CSVParser.parseCSV(csvData, "\t", 2, customHeaders)
+            
+            const dataFiltered: Record<string, string>[] = parsedData.filter((row: { [x: string]: string }) => row["State Name"]?.trim() && row["Birds Affected"] !== "0");
+            
+            const transformedData: IFlockCasesTransformed[] = FlockCasesByStateTransformer.transformData(dataFiltered);
+            
+            logger.info("Finished processing CSVs!")
+            
             return transformedData
         } catch (error) {
             logger.error(`Error processing CSV Data: ${error}`)

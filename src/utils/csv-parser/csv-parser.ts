@@ -15,7 +15,7 @@ export class CSVParser {
         delimiter: string,
         startFromRow: number,
         columns: boolean | string[] = true
-    ): any[] {
+    ): Record<string, string>[] {
         if (!fileContent) return [];
         try {
             return parse(fileContent, {

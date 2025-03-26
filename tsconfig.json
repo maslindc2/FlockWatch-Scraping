@@ -5,7 +5,8 @@
         "tests",
         "jest.setup.ts",
         "jest.config.js",
-        "init-mongo"
+        "init-mongo",
+        "eslint.config.mjs"
     ],
     "ts-node": {
         "transpileOnly": true,

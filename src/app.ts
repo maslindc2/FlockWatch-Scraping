@@ -20,8 +20,8 @@ class App {
         this.app.use("/scraper", scraperRoutes);
         this.app.use(
             "/",
-            (req: Request, res: Response, next: NextFunction): void => {
-                res.json({ message: "Nothing here but us Chickens" });
+            (req: Request, res: Response): void => {
+                res.json({ message: "Nothing here but us Robots" });
             }
         );
     }
