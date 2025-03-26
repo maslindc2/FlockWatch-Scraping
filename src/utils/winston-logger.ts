@@ -4,7 +4,7 @@ dotenv.config();
 
 export const logger = winston.createLogger({
     levels: winston.config.npm.levels,
-    level: process.env.LOG_LEVEL || "error",
+    level: process.env.LOG_LEVEL || "dev",
     format: winston.format.cli(),
     transports: [new winston.transports.Console()],
 });

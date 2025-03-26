@@ -1,16 +1,21 @@
 import { Router, Request, Response } from "express";
-import { DataProcessor } from "../services/data-processor";
+import { DataController } from "../controllers/data-controller";
 import { logger } from "../utils/winston-logger";
+import { DataProcessor } from "../services/data-processor";
 
 const router = Router();
 
 router.post("/process-data", async (req: Request, res: Response) => {
-    logger.http(`Auth ID from client: ${JSON.stringify(req.body)}`); // Log the body properly 
     const receivedAuthID = req.body.authID;
-    if (receivedAuthID === "80801") {
+    
+    const dataController = new DataController();
+    const expectedAuthID = await dataController.getServerAuthID();
+    if (receivedAuthID === expectedAuthID) {
+        logger.info(`Received valid scrape request! Starting job...`);
         const dataProcessor = new DataProcessor();
         res.json(await dataProcessor.processData());
     } else {
+        logger.error(`Received invalid authID ${receivedAuthID}!`);
         res.sendStatus(403);
     }
 });
