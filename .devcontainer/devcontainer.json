@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-mongo
 {
-	"name": "Node.js & Mongo DB",
+	"name": "Flock Watch Scraping Dev Container",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -12,7 +12,11 @@
 		"vscode": {
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
-				"mongodb.mongodb-vscode"
+				"mongodb.mongodb-vscode",
+				"eamodio.gitlens",
+				"streetsidesoftware.code-spell-checker",
+				"Orta.vscode-jest",
+				"ritwickdey.LiveServer"
 			]
 		}
 	},
