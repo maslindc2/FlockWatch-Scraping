@@ -20,10 +20,10 @@ class FlockCasesByStateTransformer
                     state: row["State Name"],
                     backyardFlocks:
                         Number(row["Backyard Flocks"].replace(/,/g, "")) || 0,
-                    birdsAffected:
-                        Number(row["Birds Affected"].replace(/,/g, "")) || 0,
                     commercialFlocks:
                         Number(row["Commercial Flocks"].replace(/,/g, "")) || 0,
+                    birdsAffected:
+                        Number(row["Birds Affected"].replace(/,/g, "")) || 0,
                     totalFlocks:
                         Number(row["Total Flocks"].replace(/,/g, "")) || 0,
                     latitude: parseFloat(row["Latitude (generated)"]),

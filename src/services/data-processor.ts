@@ -6,7 +6,7 @@ import { IFlockCasesTransformed } from "../interfaces/i-flock-cases-transformed"
 import { logger } from "../utils/winston-logger";
 
 class DataProcessor {
-    public async processData() {
+    public async processData(): Promise<IFlockCasesTransformed[]> {
         try {
             const csvFilePath: string = path.resolve(
                 __dirname,
@@ -36,7 +36,6 @@ class DataProcessor {
             const dataFiltered: Record<string, string>[] = parsedData.filter((row: { [x: string]: string }) => row["State Name"]?.trim() && row["Birds Affected"] !== "0");
             
             const transformedData: IFlockCasesTransformed[] = FlockCasesByStateTransformer.transformData(dataFiltered);
-            
             logger.info("Finished processing CSVs!")
             
             return transformedData

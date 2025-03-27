@@ -13,6 +13,7 @@ router.post("/process-data", async (req: Request, res: Response) => {
     if (receivedAuthID === expectedAuthID) {
         logger.info(`Received valid scrape request! Starting job...`);
         const dataProcessor = new DataProcessor();
+
         res.json(await dataProcessor.processData());
     } else {
         logger.error(`Received invalid authID ${receivedAuthID}!`);
