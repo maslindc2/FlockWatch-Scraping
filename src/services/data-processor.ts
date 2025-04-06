@@ -2,7 +2,7 @@ import path from "path";
 import { ReadCSV } from "../utils/csv-parser/read-csv";
 import { CSVParser } from "../utils/csv-parser/csv-parser";
 import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/flock-cases-by-state-transformer";
-import { IFlockCasesTransformed } from "../interfaces/i-flock-cases-transformed";
+import { IFlockCasesTransformed } from "../interfaces/i-flock-cases-by-state";
 import { logger } from "../utils/winston-logger";
 
 class DataProcessor {

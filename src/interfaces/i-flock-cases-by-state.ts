@@ -1,4 +1,4 @@
-interface IFlockCasesTransformed {
+interface IFlockCasesByState {
     stateAbbreviation: string;
     state: string;
     backyardFlocks: number;
@@ -9,4 +9,4 @@ interface IFlockCasesTransformed {
     longitude: number;
     lastReportedDate: Date;
 }
-export {IFlockCasesTransformed}
+export {IFlockCasesByState}

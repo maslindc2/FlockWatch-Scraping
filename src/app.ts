@@ -1,6 +1,5 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, { Application, Request, Response } from "express";
 import scraperRoutes from "./routes/scraper-routes";
-import { logger } from "./utils/winston-logger";
 import { DatabaseService } from "./services/database-service";
 
 class App {
