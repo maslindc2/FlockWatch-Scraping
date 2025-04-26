@@ -9,7 +9,6 @@ import { ILastReportDate } from "../interfaces/i-last-report-date";
 class LastReportDateModel {
     private static schema = new Mongoose.Schema<ILastReportDate>({
         lastScrapedDate: Date,
-        updateFrequency: Number,
         authID: String
     }, { collection: "last-report-date"});
 
@@ -17,6 +16,8 @@ class LastReportDateModel {
         "last-report-date",
         this.schema
     );
+
+   
 }
 
 export { LastReportDateModel };

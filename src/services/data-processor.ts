@@ -2,11 +2,11 @@ import path from "path";
 import { ReadCSV } from "../utils/csv-parser/read-csv";
 import { CSVParser } from "../utils/csv-parser/csv-parser";
 import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/flock-cases-by-state-transformer";
-import { IFlockCasesTransformed } from "../interfaces/i-flock-cases-by-state";
+import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
 import { logger } from "../utils/winston-logger";
 
 class DataProcessor {
-    public async processData(): Promise<IFlockCasesTransformed[]> {
+    public async processData(): Promise<IFlockCasesByState[]> {
         try {
             const csvFilePath: string = path.resolve(
                 __dirname,
@@ -35,7 +35,7 @@ class DataProcessor {
             
             const dataFiltered: Record<string, string>[] = parsedData.filter((row: { [x: string]: string }) => row["State Name"]?.trim() && row["Birds Affected"] !== "0");
             
-            const transformedData: IFlockCasesTransformed[] = FlockCasesByStateTransformer.transformData(dataFiltered);
+            const transformedData: IFlockCasesByState[] = FlockCasesByStateTransformer.transformData(dataFiltered);
             logger.info("Finished processing CSVs!")
             
             return transformedData

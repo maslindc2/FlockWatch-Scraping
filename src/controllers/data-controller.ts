@@ -10,8 +10,8 @@ class DataController {
 
     public async getServerAuthID(): Promise<string> {
         try {
-            const data = await this.lastReportDateService.getLastReportDate();
-            return data[0].authID;
+            const data = await this.lastReportDateService.getAuthID();
+            return data!.authID;
         } catch (error) {
             logger.error(`Error fetching Last Report Date: ${error}`);
             return "";
