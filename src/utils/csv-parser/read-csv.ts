@@ -9,10 +9,15 @@ export class ReadCSV {
      * @throws Throws error if the file is missing or does not exist
      * @returns raw data from the csv file, pass this to the parseCSV function
      */
-    public static async readCSVFile(filePath: string, fileEncoding: BufferEncoding): Promise<string> {
+    public static async readCSVFile(
+        filePath: string,
+        fileEncoding: BufferEncoding
+    ): Promise<string> {
         try {
-            const data =  await fs.readFile(filePath, { encoding: fileEncoding });
-            return data
+            const data = await fs.readFile(filePath, {
+                encoding: fileEncoding,
+            });
+            return data;
         } catch (error) {
             logger.error(`Error reading CSV File at ${filePath}`);
             logger.error(error);

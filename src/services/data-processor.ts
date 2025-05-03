@@ -23,9 +23,12 @@ class DataProcessor {
             logger.silly(`Parsing CSV File at ${csvFilePath}`);
 
             // Read the csv file from the path we provided. USDA uses UTF-16le format not the typical UTF-8
-            const csvData: string = await ReadCSV.readCSVFile(csvFilePath, "utf-16le");
+            const csvData: string = await ReadCSV.readCSVFile(
+                csvFilePath,
+                "utf-16le"
+            );
 
-            // Define the columns that we will be reading from 
+            // Define the columns that we will be reading from
             const customHeaders: string[] = [
                 "State Abbreviation",
                 "State Name",
@@ -38,24 +41,33 @@ class DataProcessor {
                 "State Boundary",
                 "State Label",
                 "Latitude (generated)",
-                "Longitude (generated)"
+                "Longitude (generated)",
             ];
             // Parse the CSV using the headers from above, the delimiter, and starting row
-            const parsedData: Record<string, string> [] = CSVParser.parseCSV(csvData, "\t", 2, customHeaders);
+            const parsedData: Record<string, string>[] = CSVParser.parseCSV(
+                csvData,
+                "\t",
+                2,
+                customHeaders
+            );
 
             // Filter out any data that is 0, we do not need to keep track of states that do not have any outbreaks
-            const dataFiltered: Record<string, string>[] = parsedData.filter((row: { [x: string]: string }) => row["State Name"]?.trim() && row["Birds Affected"] !== "0");
-            
+            const dataFiltered: Record<string, string>[] = parsedData.filter(
+                (row: { [x: string]: string }) =>
+                    row["State Name"]?.trim() && row["Birds Affected"] !== "0"
+            );
+
             // Transform the data after it's been filtered to match the expected interface IFlockCasesByState
-            const transformedData: IFlockCasesByState[] = FlockCasesByStateTransformer.transformData(dataFiltered);
-            
-            logger.info("Finished processing CSVs!")
-            
-            return transformedData
+            const transformedData: IFlockCasesByState[] =
+                FlockCasesByStateTransformer.transformData(dataFiltered);
+
+            logger.info("Finished processing CSVs!");
+
+            return transformedData;
         } catch (error) {
-            logger.error(`Error processing CSV Data: ${error}`)
+            logger.error(`Error processing CSV Data: ${error}`);
             throw new Error(`Error processing CSV Data: ${error}`);
         }
     }
 }
-export {DataProcessor}
+export { DataProcessor };

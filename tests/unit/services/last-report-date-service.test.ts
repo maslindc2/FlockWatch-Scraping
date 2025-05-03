@@ -7,7 +7,7 @@ describe("LastReportDateService Unit Tests", () => {
     beforeEach(() => {
         lastReportDateService = new LastReportDateService();
     });
-    
+
     it("should call findOne with authID and the property {$exists: true} when getAuthID is called", async () => {
         // Create our spy on the mongoose findOne function
         const findSpy = jest

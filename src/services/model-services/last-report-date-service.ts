@@ -14,20 +14,20 @@ class LastReportDateService {
             .select("-_id -__v -lastScrapedDate");
     }
     /**
-    * On server start this will be executed, if the mongoDB is being created for the first time
-    * This will create an entry with the date last scraped, scrape frequency, and auth id.
-    */
+     * On server start this will be executed, if the mongoDB is being created for the first time
+     * This will create an entry with the date last scraped, scrape frequency, and auth id.
+     */
     public async initializeLastReportDate() {
-       const existingRecord = await LastReportDateModel.getModel.findOne();
-       if (!existingRecord) {
-           const modelObj = {
-               lastScrapedDate: new Date(),
-               authID: crypto.randomUUID(),
-           };
-           return await LastReportDateModel.getModel.create(modelObj);
-       } else {
-           return existingRecord;
-       }
+        const existingRecord = await LastReportDateModel.getModel.findOne();
+        if (!existingRecord) {
+            const modelObj = {
+                lastScrapedDate: new Date(),
+                authID: crypto.randomUUID(),
+            };
+            return await LastReportDateModel.getModel.create(modelObj);
+        } else {
+            return existingRecord;
+        }
     }
 }
 export { LastReportDateService };

@@ -9,7 +9,9 @@ const router = Router();
 router.post("/process-data", async (req: Request, res: Response) => {
     // Store the authentication ID we got from Flock Watch Server
     const authHeader = req.headers.authorization;
-    const receivedAuthID = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+    const receivedAuthID = authHeader?.startsWith("Bearer ")
+        ? authHeader.slice(7).trim()
+        : null;
 
     // Create an instance for our DataController
     const dataController = new DataController();
@@ -23,7 +25,9 @@ router.post("/process-data", async (req: Request, res: Response) => {
 
         res.json(await dataProcessor.processData());
     } else {
-        logger.error(`Invalid authID from IP ${req.ip}, who sent the auth ID ${receivedAuthID}!`);
+        logger.error(
+            `Invalid authID from IP ${req.ip}, who sent the auth ID ${receivedAuthID}!`
+        );
         res.sendStatus(403);
     }
 });

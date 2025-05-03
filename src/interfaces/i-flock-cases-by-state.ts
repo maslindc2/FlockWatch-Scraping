@@ -9,4 +9,4 @@ interface IFlockCasesByState {
     longitude: number;
     lastReportedDate: Date;
 }
-export {IFlockCasesByState}
+export { IFlockCasesByState };
