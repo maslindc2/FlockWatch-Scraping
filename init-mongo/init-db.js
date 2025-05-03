@@ -3,7 +3,9 @@
 const fs = require("fs");
 
 // Read each of the JSON files containing data from mongo
-const lastReportDateAsJSON = fs.readFileSync("init-mongo/last-report-dates-data.json");
+const lastReportDateAsJSON = fs.readFileSync(
+    "init-mongo/last-report-dates-data.json"
+);
 const usSummariesAsJSON = fs.readFileSync("init-mongo/us-summaries-data.json");
 
 //Parse all the JSON files containing the data we are going to insert

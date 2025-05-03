@@ -7,11 +7,13 @@ import { ILastReportDate } from "../interfaces/i-last-report-date";
  * currentUpdateTime will store the USDA update time in this case 12PM EST
  */
 class LastReportDateModel {
-    private static schema = new Mongoose.Schema<ILastReportDate>({
-        lastScrapedDate: Date,
-        updateFrequency: Number,
-        authID: String
-    });
+    private static schema = new Mongoose.Schema<ILastReportDate>(
+        {
+            lastScrapedDate: Date,
+            authID: String,
+        },
+        { collection: "last-report-date" }
+    );
 
     public static getModel = Mongoose.model<ILastReportDate>(
         "last-report-date",
