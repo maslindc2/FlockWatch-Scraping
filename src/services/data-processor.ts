@@ -24,7 +24,7 @@ class DataProcessor {
 
             // Read the csv file from the path we provided. USDA uses UTF-16le format not the typical UTF-8
             const csvData: string = await ReadCSV.readCSVFile(csvFilePath, "utf-16le");
-            
+
             // Define the columns that we will be reading from 
             const customHeaders: string[] = [
                 "State Abbreviation",
@@ -40,13 +40,17 @@ class DataProcessor {
                 "Latitude (generated)",
                 "Longitude (generated)"
             ];
-            // Parse the CSV using the headers from above
-            const parsedData: Record<string, string> [] = CSVParser.parseCSV(csvData, "\t", 2, customHeaders)
+            // Parse the CSV using the headers from above, the delimiter, and starting row
+            const parsedData: Record<string, string> [] = CSVParser.parseCSV(csvData, "\t", 2, customHeaders);
+
             // Filter out any data that is 0, we do not need to keep track of states that do not have any outbreaks
             const dataFiltered: Record<string, string>[] = parsedData.filter((row: { [x: string]: string }) => row["State Name"]?.trim() && row["Birds Affected"] !== "0");
+            
             // Transform the data after it's been filtered to match the expected interface IFlockCasesByState
             const transformedData: IFlockCasesByState[] = FlockCasesByStateTransformer.transformData(dataFiltered);
+            
             logger.info("Finished processing CSVs!")
+            
             return transformedData
         } catch (error) {
             logger.error(`Error processing CSV Data: ${error}`)
