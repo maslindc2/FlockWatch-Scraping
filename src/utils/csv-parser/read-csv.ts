@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "fs/promises";
 import { logger } from "../winston-logger";
 
 export class ReadCSV {
@@ -9,9 +9,10 @@ export class ReadCSV {
      * @throws Throws error if the file is missing or does not exist
      * @returns raw data from the csv file, pass this to the parseCSV function
      */
-    public static readCSVFile(filePath: string, fileEncoding: BufferEncoding): string {
+    public static async readCSVFile(filePath: string, fileEncoding: BufferEncoding): Promise<string> {
         try {
-            return fs.readFileSync(filePath, { encoding: fileEncoding });
+            const data =  await fs.readFile(filePath, { encoding: fileEncoding });
+            return data
         } catch (error) {
             logger.error(`Error reading CSV File at ${filePath}`);
             logger.error(error);

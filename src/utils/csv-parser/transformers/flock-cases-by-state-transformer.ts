@@ -17,6 +17,7 @@ class FlockCasesByStateTransformer
         const transformedData: IFlockCasesByState[] = [];
         parsedData.forEach((row, index) => {
             try {
+                // Define the JS object that each state's fields will contain
                 const {
                     ["State Abbreviation"]: stateAbbreviation,
                     ["State Name"]: state,
@@ -29,7 +30,7 @@ class FlockCasesByStateTransformer
                     ["Last Reported Detection Text"]: lastReportedDetectionStr
                 } = row;
 
-                // Field presence checks
+                // Check to make sure all of the required fields have been extracted and that they exist
                 if (!stateAbbreviation) throw new Error("Missing State Abbreviation");
                 if (!state) throw new Error("Missing State Name");
                 if (!backyardFlocksStr) throw new Error("Missing Backyard Flocks");
@@ -40,7 +41,7 @@ class FlockCasesByStateTransformer
                 if (!longitudeStr) throw new Error("Missing Longitude");
                 if (!lastReportedDetectionStr) throw new Error("Missing Last Reported Detection Text");
 
-                // Parse and validate numbers
+                // Parse the fields into the expected data type
                 const backyardFlocks = Number(backyardFlocksStr.replace(/,/g, ""));
                 const commercialFlocks = Number(commercialFlocksStr.replace(/,/g, ""));
                 const birdsAffected = Number(birdsAffectedStr.replace(/,/g, ""));
@@ -48,16 +49,20 @@ class FlockCasesByStateTransformer
                 const latitude = parseFloat(latitudeStr);
                 const longitude = parseFloat(longitudeStr);
 
+                // If we failed to parse any of the above fields correctly and instead got NaN throw an error
                 if (isNaN(backyardFlocks)) throw new Error("Invalid Backyard Flocks number");
                 if (isNaN(commercialFlocks)) throw new Error("Invalid Commercial Flocks number");
                 if (isNaN(birdsAffected)) throw new Error("Invalid Birds Affected number");
                 if (isNaN(totalFlocks)) throw new Error("Invalid Total Flocks number");
                 if (isNaN(latitude)) throw new Error("Invalid Latitude");
                 if (isNaN(longitude)) throw new Error("Invalid Longitude");
-
+                
+                // Remove the last reported detect an restructure it to convert to JS's Date datatype
                 const lastReportedDate = this.extractDate(lastReportedDetectionStr);
+                // If we cannot convert the date correctly throw an error
                 if (!lastReportedDate) throw new Error("Failed to extract last reported date");
 
+                // Push all the values onto our JS object 
                 transformedData.push({
                     stateAbbreviation,
                     state,
@@ -74,7 +79,7 @@ class FlockCasesByStateTransformer
                 throw new Error(`Data transformation failed at row ${index}: ${(error as Error).message}`);
             }
         });
-
+        // Return the object
         return transformedData;
     }
     /**
