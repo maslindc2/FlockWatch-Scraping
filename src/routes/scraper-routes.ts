@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { DataController } from "../controllers/data-controller";
 import { logger } from "../utils/winston-logger";
 import { DataProcessor } from "../services/data-processor";
+import { USDAScrapingService } from "../services/usda-scraping-service";
 
 const router = Router();
 
@@ -21,9 +22,16 @@ router.post("/process-data", async (req: Request, res: Response) => {
     if (receivedAuthID === expectedAuthID) {
         // Report that we are scraping
         logger.info(`Received valid scrape request! Starting job...`);
-        const dataProcessor = new DataProcessor();
+        try{
+            const usdaScrapeService = new USDAScrapingService();
+            const csvData = await usdaScrapeService.getFlockCasesFromUSDA();
+            const dataProcessor = new DataProcessor(csvData);
 
-        res.json(await dataProcessor.processData());
+            res.json(await dataProcessor.processData());
+        } catch (error) {
+            logger.error("Error processing data: ", error);
+            res.sendStatus(500).json({ error: "Failed to process data"});
+        }
     } else {
         logger.error(
             `Invalid authID from IP ${req.ip}, who sent the auth ID ${receivedAuthID}!`

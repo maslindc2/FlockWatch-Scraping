@@ -1,9 +1,8 @@
-import path from "path";
-import { ReadCSV } from "../utils/csv-parser/read-csv";
 import { CSVParser } from "../utils/csv-parser/csv-parser";
 import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/flock-cases-by-state-transformer";
 import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
 import { logger } from "../utils/winston-logger";
+
 
 /**
  * This class is responsible for using the CSV headers to extract data and then transform it into an object that Flock Watch Server can store.
@@ -11,22 +10,17 @@ import { logger } from "../utils/winston-logger";
  * required. The FlockCasesByStateTransformer serves as an excellent example of what is required for a transformer. Once done return the data.
  */
 class DataProcessor {
-    // Parse the CSVs, assemble the data into a JS Array matching our interface, and return it
-    public async processData(): Promise<IFlockCasesByState[]> {
-        try {
-            // Map Comparisons.csv for Chickens contains all necessary data, we only need this CSV
-            const csvFilePath: string = path.resolve(
-                __dirname,
-                "../../data/Map Comparisons.csv"
-            );
-            // Log what file we are parsing
-            logger.silly(`Parsing CSV File at ${csvFilePath}`);
+    private csvDataToParse;
 
-            // Read the csv file from the path we provided. USDA uses UTF-16le format not the typical UTF-8
-            const csvData: string = await ReadCSV.readCSVFile(
-                csvFilePath,
-                "utf-16le"
-            );
+    constructor(csvData: any) {
+        this.csvDataToParse = csvData;
+    }
+
+    // Parse the CSVs, assemble the data into a JS Array matching our interface, and return it
+    public async processData(): Promise<IFlockCasesByState[] | undefined> {
+        try {
+            const decoder = new TextDecoder("utf-16le");
+            const csvString = decoder.decode(this.csvDataToParse);
 
             // Define the columns that we will be reading from
             const customHeaders: string[] = [
@@ -45,12 +39,12 @@ class DataProcessor {
             ];
             // Parse the CSV using the headers from above, the delimiter, and starting row
             const parsedData: Record<string, string>[] = CSVParser.parseCSV(
-                csvData,
+                csvString,
                 "\t",
                 2,
                 customHeaders
             );
-
+            
             // Filter out any data that is 0, we do not need to keep track of states that do not have any outbreaks
             const dataFiltered: Record<string, string>[] = parsedData.filter(
                 (row: { [x: string]: string }) =>
@@ -66,7 +60,6 @@ class DataProcessor {
             return transformedData;
         } catch (error) {
             logger.error(`Error processing CSV Data: ${error}`);
-            throw new Error(`Error processing CSV Data: ${error}`);
         }
     }
 }

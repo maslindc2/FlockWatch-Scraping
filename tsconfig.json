@@ -6,7 +6,8 @@
         "jest.setup.ts",
         "jest.config.js",
         "init-mongo",
-        "eslint.config.mjs"
+        "eslint.config.mjs",
+        "playwright.config.ts"
     ],
     "ts-node": {
         "transpileOnly": true,
