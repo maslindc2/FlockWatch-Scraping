@@ -17,7 +17,7 @@ class DataProcessor {
     }
 
     // Parse the CSVs, assemble the data into a JS Array matching our interface, and return it
-    public async processData(): Promise<IFlockCasesByState[] | undefined> {
+    public async processData(): Promise<IFlockCasesByState[]> {
         try {
             const decoder = new TextDecoder("utf-16le");
             const csvString = decoder.decode(this.csvDataToParse);
@@ -60,6 +60,7 @@ class DataProcessor {
             return transformedData;
         } catch (error) {
             logger.error(`Error processing CSV Data: ${error}`);
+            throw new Error(`Failed to process CSV Data: ${error}`);
         }
     }
 }
