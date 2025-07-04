@@ -77,9 +77,6 @@ class FlockCasesByStateTransformer {
                 const lastReportedDate = this.extractDate(
                     lastReportedDetectionStr
                 );
-                // If we cannot convert the date correctly throw an error
-                if (!lastReportedDate)
-                    throw new Error("Failed to extract last reported date");
 
                 // Push all the values onto our JS object
                 transformedData.push({
@@ -119,10 +116,18 @@ class FlockCasesByStateTransformer {
             throw new Error(`Invalid date format: ${dateAsString}`);
         }
 
-        const [, month, day, year] = match.map(Number);
+        const [, monthStr, dayStr, yearStr] = match.map(Number);
+        const month = Number(monthStr);
+        const day = Number(dayStr);
+        const year = Number(yearStr);
+
         const date = new Date(Date.UTC(year, month - 1, day));
 
-        if (isNaN(date.getTime())) {
+        if (
+            date.getUTCFullYear() !== year ||
+            date.getUTCMonth() + 1 !== month ||
+            date.getUTCDate() !== day
+        ) {
             logger.error(`Invalid date value for ${dateAsString}`);
             throw new Error(`Invalid date value: ${dateAsString}`);
         }

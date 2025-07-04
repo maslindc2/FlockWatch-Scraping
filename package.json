@@ -1,13 +1,14 @@
 {
     "name": "flockwatch-scraping",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "main": "index.js",
     "scripts": {
         "test": "jest --coverage",
         "test:unit": "jest --testPathPattern=tests/unit",
         "test:integration": "jest --testPathPattern=tests/integration",
-        "dev": "nodemon ./src/server.ts",
+        "nodemon": "nodemon ./src/server.ts",
         "build": "tsc --project tsconfig.json",
+        "dev": "npm run build && node ./dist/server.js",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
     },
     "repository": {
@@ -22,6 +23,7 @@
     "homepage": "https://github.com/maslindc2/FlockWatch-Scraping#readme",
     "description": "",
     "dependencies": {
+        "axios": "^1.10.0",
         "cors": "^2.8.5",
         "csv": "^6.3.11",
         "csv-parse": "^5.6.0",
@@ -34,8 +36,10 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.23.0",
+        "@playwright/test": "^1.53.1",
         "@types/express": "^5.0.1",
         "@types/jest": "^29.5.14",
+        "@types/node": "^24.0.3",
         "@types/supertest": "^6.0.2",
         "eslint": "^9.23.0",
         "globals": "^16.0.0",

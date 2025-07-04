@@ -11,7 +11,7 @@ export class CSVParser {
      * @returns Parsed CSV data using the delimiter creates an array
      */
     public static parseCSV(
-        fileContent: string | null,
+        fileContent: string,
         delimiter: string,
         startFromRow: number,
         columns: boolean | string[] = true
@@ -27,7 +27,7 @@ export class CSVParser {
             });
         } catch (error) {
             logger.error(`Error parsing CSV file: ${error}`);
-            return [];
+            throw new Error(`CSV is malformed resulted in ${error}`);
         }
     }
 }
