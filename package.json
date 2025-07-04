@@ -1,13 +1,14 @@
 {
     "name": "flockwatch-scraping",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "main": "index.js",
     "scripts": {
         "test": "jest --coverage",
         "test:unit": "jest --testPathPattern=tests/unit",
         "test:integration": "jest --testPathPattern=tests/integration",
-        "dev": "nodemon ./src/server.ts",
+        "nodemon": "nodemon ./src/server.ts",
         "build": "tsc --project tsconfig.json",
+        "dev": "npm run build && node ./dist/server.js",
         "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
     },
     "repository": {
