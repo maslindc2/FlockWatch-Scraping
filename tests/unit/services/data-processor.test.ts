@@ -1,7 +1,4 @@
-import path from "path";
 import { DataProcessor } from "../../../src/services/data-processor";
-import { Logger } from "winston";
-import { ReadCSV } from "../../../src/utils/csv-parser/read-csv";
 import { CSVParser } from "../../../src/utils/csv-parser/csv-parser";
 import { IFlockCasesByState } from "../../../src/interfaces/i-flock-cases-by-state";
 
