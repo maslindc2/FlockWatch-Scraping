@@ -10,8 +10,8 @@ describe("LastReportDateService Unit Tests", () => {
 
     it("should call findOne with authID and the property {$exists: true} when getAuthID is called", async () => {
         const leanMock = jest.fn().mockResolvedValue({});
-        const selectMock = jest.fn(() => ({lean: leanMock}));
-        
+        const selectMock = jest.fn(() => ({ lean: leanMock }));
+
         // Create our spy on the mongoose findOne function
         const findSpy = jest
             .spyOn(LastReportDateModel.getModel, "findOne")
@@ -32,7 +32,7 @@ describe("LastReportDateService Unit Tests", () => {
     });
     it("should call select while hiding the _id, __v, lastScrapedDate elements when getAuthID is called", async () => {
         const leanMock = jest.fn().mockResolvedValue({});
-        const selectMock = jest.fn(() => ({lean: leanMock}));
+        const selectMock = jest.fn(() => ({ lean: leanMock }));
         // Create our spy on the mongoose findOne function
         const selectSpy = jest
             .spyOn(LastReportDateModel.getModel, "findOne")
@@ -53,7 +53,7 @@ describe("LastReportDateService Unit Tests", () => {
     });
     it("should call findOne with lastScrapedDate and the property {$exists: true} when getLastScrapedDate is called", async () => {
         const leanMock = jest.fn().mockResolvedValue({});
-        const selectMock = jest.fn(() => ({lean: leanMock}));
+        const selectMock = jest.fn(() => ({ lean: leanMock }));
         // Create our spy on the mongoose findOne function
         const findSpy = jest
             .spyOn(LastReportDateModel.getModel, "findOne")
@@ -71,11 +71,10 @@ describe("LastReportDateService Unit Tests", () => {
         findSpy.mockRestore();
         leanMock.mockRestore();
         selectMock.mockRestore();
-
     });
     it("should call select while hiding the _id, __v, authID elements when getLastScrapedDate is called", async () => {
         const leanMock = jest.fn().mockResolvedValue({});
-        const selectMock = jest.fn(() => ({lean: leanMock}));
+        const selectMock = jest.fn(() => ({ lean: leanMock }));
         // Create our spy on the mongoose findOne function
         const selectSpy = jest
             .spyOn(LastReportDateModel.getModel, "findOne")

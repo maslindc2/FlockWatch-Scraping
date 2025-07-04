@@ -49,14 +49,15 @@ describe("Data Processor Unit Test", () => {
 
         // Get the spy to return our fake CSV data which can then be passed into filter and transform stages
         csvParserSpy.mockReturnValue(fakeCSVData);
-        
+
         const mockCSVData = new ArrayBuffer(1024); // Mock CSV data
 
         // Call data processor and store the results
         const dataProcessor = new DataProcessor(mockCSVData);
 
         // Call process data to get the fake data turned into the expected datatype
-        const transformedData: IFlockCasesByState[] = await dataProcessor.processData();
+        const transformedData: IFlockCasesByState[] =
+            await dataProcessor.processData();
 
         // Expect the csv parser to be called with a string, the delimiter, and starting row, as well as the correct column headers
         expect(csvParserSpy).toHaveBeenCalledWith(
@@ -81,7 +82,7 @@ describe("Data Processor Unit Test", () => {
             },
         ]);
     });
-    it("should handle missing or empty data gracefully", async() => {
+    it("should handle missing or empty data gracefully", async () => {
         // Create fake data with birds affected, backyard flocks, commercial flocks set to 0
         const fakeCSVData = [
             {
@@ -103,20 +104,23 @@ describe("Data Processor Unit Test", () => {
         // Return the fake data when our parse function is called
         csvParserSpy.mockReturnValue(fakeCSVData);
         // create an ArrayBuffer as DataProcessor requires one
-        const mockCSVData = new ArrayBuffer(1024); 
+        const mockCSVData = new ArrayBuffer(1024);
         // Call data processor and store the results
         const dataProcessor = new DataProcessor(mockCSVData);
         // Get the transformed data back, since we provided 0 for birds affected, backyard flocks, commercial flocks we end up filtering this state out
-        const transformedData: IFlockCasesByState[] = await dataProcessor.processData();
+        const transformedData: IFlockCasesByState[] =
+            await dataProcessor.processData();
         // Expect the array to be empty as there is no data for that state.
         expect(transformedData.length).toBe(0);
     });
-    it("should throw error when CSV parsing fails", async() => {
+    it("should throw error when CSV parsing fails", async () => {
         csvParserSpy.mockImplementation(() => {
             throw new Error("CSV Processing Failed!");
         });
         const dataProcessor = new DataProcessor(new ArrayBuffer(1024));
-        await expect(dataProcessor.processData()).rejects.toThrow("Failed to process CSV Data: Error: CSV Processing Failed!");
+        await expect(dataProcessor.processData()).rejects.toThrow(
+            "Failed to process CSV Data: Error: CSV Processing Failed!"
+        );
     });
     afterEach(() => {
         csvParserSpy.mockRestore();

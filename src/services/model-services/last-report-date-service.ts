@@ -5,20 +5,24 @@ class LastReportDateService {
     public async getLastScrapedDate() {
         return LastReportDateModel.getModel
             .findOne({ lastScrapedDate: { $exists: true } })
-            .select("-_id -__v -authID").lean();
+            .select("-_id -__v -authID")
+            .lean();
     }
     // Only get the authID
     public async getAuthID() {
         return LastReportDateModel.getModel
             .findOne({ authID: { $exists: true } })
-            .select("-_id -__v -lastScrapedDate").lean();
+            .select("-_id -__v -lastScrapedDate")
+            .lean();
     }
     /**
      * On server start this will be executed, if the mongoDB is being created for the first time
      * This will create an entry with the date last scraped, scrape frequency, and auth id.
      */
     public async initializeLastReportDate() {
-        const existingRecord = await LastReportDateModel.getModel.findOne().lean();
+        const existingRecord = await LastReportDateModel.getModel
+            .findOne()
+            .lean();
         if (!existingRecord) {
             const modelObj = {
                 lastScrapedDate: new Date(),

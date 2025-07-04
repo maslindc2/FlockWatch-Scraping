@@ -18,7 +18,6 @@ class FlockCasesByStateTransformer {
         const transformedData: IFlockCasesByState[] = [];
         parsedData.forEach((row, index) => {
             try {
-
                 // Define the JS object that each state's fields will contain
                 const {
                     ["State Abbreviation"]: stateAbbreviation,
@@ -123,12 +122,12 @@ class FlockCasesByStateTransformer {
         const year = Number(yearStr);
 
         const date = new Date(Date.UTC(year, month - 1, day));
-        
-        if(
+
+        if (
             date.getUTCFullYear() !== year ||
             date.getUTCMonth() + 1 !== month ||
             date.getUTCDate() !== day
-        ){
+        ) {
             logger.error(`Invalid date value for ${dateAsString}`);
             throw new Error(`Invalid date value: ${dateAsString}`);
         }

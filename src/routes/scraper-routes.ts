@@ -22,7 +22,7 @@ router.post("/process-data", async (req: Request, res: Response) => {
     if (receivedAuthID === expectedAuthID) {
         // Report that we are scraping
         logger.info(`Received valid scrape request! Starting job...`);
-        try{
+        try {
             const usdaScrapeService = new USDAScrapingService();
             const csvData = await usdaScrapeService.getFlockCasesFromUSDA();
             const dataProcessor = new DataProcessor(csvData);
@@ -30,7 +30,7 @@ router.post("/process-data", async (req: Request, res: Response) => {
             res.json(await dataProcessor.processData());
         } catch (error) {
             logger.error("Error processing data: ", error);
-            res.sendStatus(500).json({ error: "Failed to process data"});
+            res.sendStatus(500).json({ error: "Failed to process data" });
         }
     } else {
         logger.error(

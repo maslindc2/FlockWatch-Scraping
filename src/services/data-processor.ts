@@ -3,7 +3,6 @@ import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/f
 import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
 import { logger } from "../utils/winston-logger";
 
-
 /**
  * This class is responsible for using the CSV headers to extract data and then transform it into an object that Flock Watch Server can store.
  * When adding new CSVs you must declare the CSV headers, filter out any empty columns, write a transformer to convert an array of data into the appropriate fields
@@ -44,7 +43,7 @@ class DataProcessor {
                 2,
                 customHeaders
             );
-            
+
             // Filter out any data that is 0, we do not need to keep track of states that do not have any outbreaks
             const dataFiltered: Record<string, string>[] = parsedData.filter(
                 (row: { [x: string]: string }) =>
