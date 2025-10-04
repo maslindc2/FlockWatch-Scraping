@@ -23,11 +23,24 @@ router.post("/process-data", async (req: Request, res: Response) => {
         // Report that we are scraping
         logger.info(`Received valid scrape request! Starting job...`);
         try {
+            // Create the scraping service
             const usdaScrapeService = new USDAScrapingService();
-            const csvData = await usdaScrapeService.getFlockCasesFromUSDA();
-            const dataProcessor = new DataProcessor(csvData);
-
-            res.json(await dataProcessor.processData());
+            // Get the All Time US Data for each state
+            const mapComparisonCSV = await usdaScrapeService.getAllTimeTotals();
+            // Get the last 30 day totals for the entire United States
+            const last30DayTotalsCSVs = await usdaScrapeService.getLast30Days();
+            // Create a data processor object
+            const dataProcessor = new DataProcessor();
+            // Process the mapComparisons CSV
+            const allTimeTotalsByState = await dataProcessor.processMapComparisonsCSV(mapComparisonCSV);
+            // Process the last 30 day totals
+            const last30DaysUS = await dataProcessor.processLast30DayTotalsCSVs(last30DayTotalsCSVs);
+            // Assemble an object for returning to the client
+            const data = {
+                allTimeTotalsByState: allTimeTotalsByState,
+                last30DaysUS: last30DaysUS
+            }
+            res.json(data);
         } catch (error) {
             logger.error("Error processing data: ", error);
             res.sendStatus(500).json({ error: "Failed to process data" });

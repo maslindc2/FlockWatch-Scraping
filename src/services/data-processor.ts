@@ -2,6 +2,16 @@ import { CSVParser } from "../utils/csv-parser/csv-parser";
 import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/flock-cases-by-state-transformer";
 import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
 import { logger } from "../utils/winston-logger";
+import { Last30DaysCSVs } from "./usda-scraping-service";
+import fs from "fs";
+import { ILast30Days } from "../interfaces/i-last-30-days-stats";
+import { Last30DaysTransformer } from "../utils/csv-parser/transformers/last-30-day-totals-transformer";
+
+interface ParseCSVConfig {
+    csvHeaders: string[],
+    delimiter: string,
+    startFromRow: number
+}
 
 /**
  * This class is responsible for using the CSV headers to extract data and then transform it into an object that Flock Watch Server can store.
@@ -9,18 +19,23 @@ import { logger } from "../utils/winston-logger";
  * required. The FlockCasesByStateTransformer serves as an excellent example of what is required for a transformer. Once done return the data.
  */
 class DataProcessor {
-    private csvDataToParse;
-
-    constructor(csvData: any) {
-        this.csvDataToParse = csvData;
+    private async parseCSVData(parseConfig: ParseCSVConfig, csvData: any): Promise<Record<string, string>[]> {
+        const decoder = new TextDecoder("utf-16le");
+        const csvString = decoder.decode(csvData);
+        
+        // Parse the CSV using the headers from above, the delimiter, and starting row
+        const parsedData: Record<string, string>[] = CSVParser.parseCSV(
+            csvString,
+            parseConfig.delimiter,
+            parseConfig.startFromRow,
+            parseConfig.csvHeaders
+        );
+        return parsedData
     }
 
-    // Parse the CSVs, assemble the data into a JS Array matching our interface, and return it
-    public async processData(): Promise<IFlockCasesByState[]> {
+    // Parse the CSV and assemble the data into a JS Array matching our interface, and return it
+    public async processMapComparisonsCSV(mapComparisonCSV: any): Promise<IFlockCasesByState[]> {
         try {
-            const decoder = new TextDecoder("utf-16le");
-            const csvString = decoder.decode(this.csvDataToParse);
-
             // Define the columns that we will be reading from
             const customHeaders: string[] = [
                 "State Abbreviation",
@@ -36,13 +51,14 @@ class DataProcessor {
                 "Latitude (generated)",
                 "Longitude (generated)",
             ];
-            // Parse the CSV using the headers from above, the delimiter, and starting row
-            const parsedData: Record<string, string>[] = CSVParser.parseCSV(
-                csvString,
-                "\t",
-                2,
-                customHeaders
-            );
+
+            const parseConfig: ParseCSVConfig = {
+                csvHeaders: customHeaders,
+                delimiter: "\t",
+                startFromRow: 2
+            }
+            
+            const parsedData = await this.parseCSVData(parseConfig, mapComparisonCSV);
 
             // Filter out any data that is 0, we do not need to keep track of states that do not have any outbreaks
             const dataFiltered: Record<string, string>[] = parsedData.filter(
@@ -61,6 +77,49 @@ class DataProcessor {
             logger.error(`Error processing CSV Data: ${error}`);
             throw new Error(`Failed to process CSV Data: ${error}`);
         }
+    }
+
+    // Parse the CSVs required for the last 30 day totals and assemble and return the data
+    public async processLast30DayTotalsCSVs(last30DayTotalsCSVs: Last30DaysCSVs): Promise<any> {
+               
+        const affectedTotalsCSV = last30DayTotalsCSVs.affectedTotalsCSV;
+        
+        const affectedTotalsHeaders: string[] = [
+            "1",
+            "Commercial Flocks (last 30 days)",
+            "Backyard Flocks (last 30 days)",
+            "Birds Affected (last 30 days)"
+        ]
+        
+        const affectedTotalsParseConfig: ParseCSVConfig = {
+            csvHeaders: affectedTotalsHeaders,
+            delimiter: "\t",
+            startFromRow: 2
+        }
+        
+        // Store the processed data
+        const affectedTotalsData = await this.parseCSVData(affectedTotalsParseConfig, affectedTotalsCSV);
+
+        //Store the CSV for Confirmed Flocks Total
+        const confirmedFlocksTotalCSV = last30DayTotalsCSVs.confirmedFlocksTotalCSV
+
+        // Decode and split the CSV strings
+        // We can't use CSV Parser because this data is not in the traditional CSV style
+        const decoder = new TextDecoder("utf-16le");        
+        const confirmedFlocksLinesDecoded = decoder.decode(confirmedFlocksTotalCSV);
+        const confirmedFlocksLines = confirmedFlocksLinesDecoded.trim().split(/\r?\n/);
+        
+        // Process the array of strings to create the confirmed flocks object
+        const confirmedFlockTotals: Record<string, string> = {};
+        for (const line of confirmedFlocksLines) {
+            const [key, value] = line.split("\t").map(s => s.trim());
+            confirmedFlockTotals[key] = value;
+        }
+
+        // Send parsed data to transformer and then return that transformed data
+        const transformedData:ILast30Days = Last30DaysTransformer.transformData(affectedTotalsData, confirmedFlockTotals);
+        return transformedData;
+
     }
 }
 export { DataProcessor };
