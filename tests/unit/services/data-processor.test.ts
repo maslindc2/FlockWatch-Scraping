@@ -53,11 +53,11 @@ describe("Data Processor Unit Test", () => {
         const mockCSVData = new ArrayBuffer(1024); // Mock CSV data
 
         // Call data processor and store the results
-        const dataProcessor = new DataProcessor(mockCSVData);
+        const dataProcessor = new DataProcessor();
 
         // Call process data to get the fake data turned into the expected datatype
         const transformedData: IFlockCasesByState[] =
-            await dataProcessor.processData();
+            await dataProcessor.processMapComparisonsCSV(mockCSVData);
 
         // Expect the csv parser to be called with a string, the delimiter, and starting row, as well as the correct column headers
         expect(csvParserSpy).toHaveBeenCalledWith(
@@ -106,10 +106,10 @@ describe("Data Processor Unit Test", () => {
         // create an ArrayBuffer as DataProcessor requires one
         const mockCSVData = new ArrayBuffer(1024);
         // Call data processor and store the results
-        const dataProcessor = new DataProcessor(mockCSVData);
+        const dataProcessor = new DataProcessor();
         // Get the transformed data back, since we provided 0 for birds affected, backyard flocks, commercial flocks we end up filtering this state out
         const transformedData: IFlockCasesByState[] =
-            await dataProcessor.processData();
+            await dataProcessor.processMapComparisonsCSV(mockCSVData);
         // Expect the array to be empty as there is no data for that state.
         expect(transformedData.length).toBe(0);
     });
@@ -117,8 +117,8 @@ describe("Data Processor Unit Test", () => {
         csvParserSpy.mockImplementation(() => {
             throw new Error("CSV Processing Failed!");
         });
-        const dataProcessor = new DataProcessor(new ArrayBuffer(1024));
-        await expect(dataProcessor.processData()).rejects.toThrow(
+        const dataProcessor = new DataProcessor();
+        await expect(dataProcessor.processMapComparisonsCSV(new ArrayBuffer(1024))).rejects.toThrow(
             "Failed to process CSV Data: Error: CSV Processing Failed!"
         );
     });

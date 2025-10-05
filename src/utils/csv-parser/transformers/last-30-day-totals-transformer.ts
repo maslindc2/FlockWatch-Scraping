@@ -46,6 +46,7 @@ class Last30DaysTransformer {
             if (!commercialFlocksStr)
                 throw new Error("Missing Commercial Flocks (last 30 days)");
 
+            const periodName = "last30Days";
             const totalBirdsAffected = this.parseNumber(birdsAffectedStr);
             const totalFlocksAffected = this.parseNumber(totalFlocksStr);
             const totalBackyardFlocksAffected =
@@ -63,6 +64,7 @@ class Last30DaysTransformer {
                 throw new Error("Invalid Commercial Flocks number");
 
             return {
+                periodName,
                 totalBirdsAffected,
                 totalFlocksAffected,
                 totalBackyardFlocksAffected,

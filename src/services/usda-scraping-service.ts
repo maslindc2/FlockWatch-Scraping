@@ -2,15 +2,15 @@ import { Browser, Page, chromium, selectors } from "playwright";
 import axios from "axios";
 import { logger } from "../utils/winston-logger";
 
-interface USDAScrapingConfig {
+interface IUSDAScrapingConfig {
     headless: boolean;
     testIdAttribute: string;
     scrapeURL: string;
 }
 
-interface Last30DaysCSVs {
-    affectedTotalsCSV: SharedArrayBuffer,
-    confirmedFlocksTotalCSV: SharedArrayBuffer
+interface ILast30DaysCSVs {
+    affectedTotalsCSV: SharedArrayBuffer;
+    confirmedFlocksTotalCSV: SharedArrayBuffer;
 }
 
 class USDAScrapingService {
@@ -23,7 +23,7 @@ class USDAScrapingService {
      * testIdAttribute: We can use the testId to target buttons that Tableau attempts to block from scrapers clicking on them
      * scrapeURL: This is the URL that goes directly to the Tableau Data Widget.
      */
-    private readonly config: USDAScrapingConfig = {
+    private readonly config: IUSDAScrapingConfig = {
         headless: false,
         testIdAttribute: "data-tb-test-id",
         scrapeURL: process.env.SCRAPE_URL!,
@@ -34,7 +34,7 @@ class USDAScrapingService {
      * @returns Returns a browser and page instance
      */
     private async setupBrowser(
-        config: USDAScrapingConfig
+        config: IUSDAScrapingConfig
     ): Promise<{ browser: Browser; page: Page }> {
         selectors.setTestIdAttribute(config.testIdAttribute);
         const browser = await chromium.launch({ headless: config.headless });
@@ -117,7 +117,7 @@ class USDAScrapingService {
             await this.selectFlockType();
             // Select the time period we want
             await this.selectTimePeriod();
-            
+
             // Select the download options we want
             await this.selectDownloadOptions("Map Comparisons");
             // Get the download URL
@@ -151,14 +151,14 @@ class USDAScrapingService {
         }
     }
     /**
-     * This function gathers the CSV files for calculating the infections over the last 30 days. 
+     * This function gathers the CSV files for calculating the infections over the last 30 days.
      * Scraped two key files for this: Affected Totals.csv and Confirmed Flock Totals.csv
      * @returns an object of type Last30DaysCSVs where the each key is the corresponding CSV (i.e. affectedTotalsCSV is the Affected Totals.csv)
      */
-    public async getLast30Days(): Promise<Last30DaysCSVs> {
+    public async getLast30Days(): Promise<ILast30DaysCSVs> {
         try {
             // Set up the browser instance using the config from above
-            const { browser: browserInstance, page} = await this.setupBrowser(
+            const { browser: browserInstance, page } = await this.setupBrowser(
                 this.config
             );
 
@@ -166,7 +166,7 @@ class USDAScrapingService {
             this.browser = browserInstance;
             // Store the page instance
             this.page = page;
-            
+
             // Go to the URL we want to scrape
             await this.page.goto(this.config.scrapeURL);
 
@@ -177,14 +177,17 @@ class USDAScrapingService {
             // Store the download url for the Affected Totals CSV
             let downloadURL = await this.initiateDownload();
 
-            
             logger.info("Started logging Network responses");
             // Use axios to store the CSV data into a variable we can then pass to a CSV Parser later on
-            const affectedTotalsResponse = await axios.get<SharedArrayBuffer>(downloadURL, {
-                responseType: "arraybuffer",
-            });
-            
-            const affectedTotalsCSV:SharedArrayBuffer = affectedTotalsResponse.data;
+            const affectedTotalsResponse = await axios.get<SharedArrayBuffer>(
+                downloadURL,
+                {
+                    responseType: "arraybuffer",
+                }
+            );
+
+            const affectedTotalsCSV: SharedArrayBuffer =
+                affectedTotalsResponse.data;
             logger.info(
                 `Successfully downloaded Affected Totals CSV with Axios (${affectedTotalsCSV.byteLength} bytes)`
             );
@@ -199,18 +202,18 @@ class USDAScrapingService {
             logger.info("Started logging Network responses");
             // Use axios to store the CSV data into a variable we can then pass to a CSV Parser later on
             // We can just overwrite the previous response
-            const confirmedFlocksTotalResponse = await axios.get<SharedArrayBuffer>(downloadURL, {
-                responseType: "arraybuffer",
-            });
-            
+            const confirmedFlocksTotalResponse =
+                await axios.get<SharedArrayBuffer>(downloadURL, {
+                    responseType: "arraybuffer",
+                });
+
             // Get the CSV for confirmed Flocks Total
             const confirmedFlocksTotalCSV = confirmedFlocksTotalResponse.data;
             // Return them as an object to be parsed by the CSV Parser
             return {
                 affectedTotalsCSV: affectedTotalsCSV,
-                confirmedFlocksTotalCSV: confirmedFlocksTotalCSV
-            }
-
+                confirmedFlocksTotalCSV: confirmedFlocksTotalCSV,
+            };
         } catch (error) {
             logger.error(
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
@@ -219,12 +222,11 @@ class USDAScrapingService {
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
         } finally {
-            if(this.browser) {
+            if (this.browser) {
                 logger.info("Closing browser instance");
                 await this.closeBrowser();
             }
         }
-        
     }
 }
-export { USDAScrapingService, Last30DaysCSVs };
+export { USDAScrapingService, ILast30DaysCSVs };

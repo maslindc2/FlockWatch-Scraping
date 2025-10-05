@@ -2,7 +2,12 @@ import { Router, Request, Response } from "express";
 import { DataController } from "../controllers/data-controller";
 import { logger } from "../utils/winston-logger";
 import { DataProcessor } from "../services/data-processor";
-import { USDAScrapingService } from "../services/usda-scraping-service";
+import {
+    ILast30DaysCSVs,
+    USDAScrapingService,
+} from "../services/usda-scraping-service";
+import { ILast30Days } from "../interfaces/i-last-30-days-stats";
+import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
 
 const router = Router();
 
@@ -28,19 +33,27 @@ router.post("/process-data", async (req: Request, res: Response) => {
             // Get the All Time US Data for each state
             const mapComparisonCSV = await usdaScrapeService.getAllTimeTotals();
             // Get the last 30 day totals for the entire United States
-            const last30DayTotalsCSVs = await usdaScrapeService.getLast30Days();
+            const last30DayTotalsCSVs: ILast30DaysCSVs =
+                await usdaScrapeService.getLast30Days();
             // Create a data processor object
             const dataProcessor = new DataProcessor();
+
             // Process the mapComparisons CSV
-            const allTimeTotalsByState = await dataProcessor.processMapComparisonsCSV(mapComparisonCSV);
+            const flockCasesByState: IFlockCasesByState[] =
+                await dataProcessor.processMapComparisonsCSV(mapComparisonCSV);
+
             // Process the last 30 day totals
-            const last30DaysUS = await dataProcessor.processLast30DayTotalsCSVs(last30DayTotalsCSVs);
+            const periodSummaries: ILast30Days[] =
+                await dataProcessor.processLast30DayTotalsCSVs(
+                    last30DayTotalsCSVs
+                );
+
             // Assemble an object for returning to the client
-            const data = {
-                allTimeTotalsByState: allTimeTotalsByState,
-                last30DaysUS: last30DaysUS
-            }
-            res.json(data);
+            const responseData = {
+                flockCasesByState: flockCasesByState,
+                periodSummaries: periodSummaries,
+            };
+            res.json(responseData);
         } catch (error) {
             logger.error("Error processing data: ", error);
             res.sendStatus(500).json({ error: "Failed to process data" });
