@@ -1,6 +1,6 @@
-import { IFlockCasesByState } from "../../../src/interfaces/i-flock-cases-by-state";
+import { FlockCasesByState } from "../../../src/modules/data-processing/flock-cases-by-state.interface";
 import { logger } from "../../../src/utils/winston-logger";
-import { FlockCasesByStateTransformer } from "../../../src/utils/csv-parser/transformers/flock-cases-by-state-transformer";
+import { FlockCasesByStateTransformer } from "../../../src/modules/data-processing/data-transformers/flock-cases-by-state-transformer";
 
 describe("Flock Cases By State Transformer Unit Tests", () => {
     it("should transform fake CSV data into the expected IFlockCasesByState type", () => {
@@ -39,15 +39,15 @@ describe("Flock Cases By State Transformer Unit Tests", () => {
 
         expect(transformedData).toEqual([
             {
-                stateAbbreviation: "WI",
+                state_abbreviation: "WI",
                 state: "Wisconsin",
-                backyardFlocks: 20,
-                commercialFlocks: 19,
-                birdsAffected: 3685424,
-                totalFlocks: 39,
+                backyard_flocks: 20,
+                commercial_flocks: 19,
+                birds_affected: 3685424,
+                total_flocks: 39,
                 latitude: 44.947205162,
                 longitude: -90.336235388,
-                lastReportedDate: new Date("2024-12-27T00:00:00.000Z"),
+                last_reported_detection: new Date("2024-12-27T00:00:00.000Z"),
             },
         ]);
     });

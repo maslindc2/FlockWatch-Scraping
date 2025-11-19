@@ -1,6 +1,6 @@
-import { DataProcessor } from "../../../src/services/data-processor";
-import { CSVParser } from "../../../src/utils/csv-parser/csv-parser";
-import { IFlockCasesByState } from "../../../src/interfaces/i-flock-cases-by-state";
+import { DataProcessor } from "../../../src/modules/data-processing/data-processor";
+import { CSVParser } from "../../../src/modules/data-processing/csv/csv-parser";
+import { FlockCasesByState } from "../../../src/modules/data-processing/flock-cases-by-state.interface";
 
 describe("Data Processor Unit Test", () => {
     // Create variables for the spy instances that we will be using for these tests
@@ -56,7 +56,7 @@ describe("Data Processor Unit Test", () => {
         const dataProcessor = new DataProcessor();
 
         // Call process data to get the fake data turned into the expected datatype
-        const transformedData: IFlockCasesByState[] =
+        const transformedData: FlockCasesByState[] =
             await dataProcessor.processMapComparisonsCSV(mockCSVData);
 
         // Expect the csv parser to be called with a string, the delimiter, and starting row, as well as the correct column headers
@@ -70,15 +70,15 @@ describe("Data Processor Unit Test", () => {
         // Expect the fakeCSVData to be transformed into the correct format
         expect(transformedData).toEqual([
             {
-                stateAbbreviation: "WI",
+                state_abbreviation: "WI",
                 state: "Wisconsin",
-                backyardFlocks: 20,
-                commercialFlocks: 19,
-                birdsAffected: 3685424,
-                totalFlocks: 39,
+                backyard_flocks: 20,
+                commercial_flocks: 19,
+                birds_affected: 3685424,
+                total_flocks: 39,
                 latitude: 44.947205162,
                 longitude: -90.336235388,
-                lastReportedDate: new Date("2024-12-27T00:00:00.000Z"),
+                last_reported_detection: new Date("2024-12-27T00:00:00.000Z"),
             },
         ]);
     });
@@ -108,7 +108,7 @@ describe("Data Processor Unit Test", () => {
         // Call data processor and store the results
         const dataProcessor = new DataProcessor();
         // Get the transformed data back, since we provided 0 for birds affected, backyard flocks, commercial flocks we end up filtering this state out
-        const transformedData: IFlockCasesByState[] =
+        const transformedData: FlockCasesByState[] =
             await dataProcessor.processMapComparisonsCSV(mockCSVData);
         // Expect the array to be empty as there is no data for that state.
         expect(transformedData.length).toBe(0);

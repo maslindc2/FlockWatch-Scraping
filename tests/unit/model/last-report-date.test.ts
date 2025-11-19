@@ -1,4 +1,4 @@
-import { LastReportDateModel } from "../../../src/models/last-report-date-model";
+import { LastReportDateModel } from "../../../src/modules/last-report-date/last-report-date.model";
 describe("LastReportDateModel", () => {
     it("should have the correct collection name when we define a LastReportDateModel", () => {
         const collectionName = LastReportDateModel.getModel.collection.name;
@@ -10,12 +10,12 @@ describe("LastReportDateModel", () => {
     });
     it("should have the correct fields when we define a LastReportDateModel", () => {
         const schemaFields = LastReportDateModel.getModel.schema.obj;
-        expect(schemaFields).toHaveProperty("lastScrapedDate");
-        expect(schemaFields).toHaveProperty("authID");
+        expect(schemaFields).toHaveProperty("last_scraped_date");
+        expect(schemaFields).toHaveProperty("auth_id");
     });
     it("should have the correct datatypes for each field when we define a LastReportDateModel", () => {
         const schemaFields = LastReportDateModel.getModel.schema.obj;
-        expect(schemaFields.lastScrapedDate).toBe(Date);
-        expect(schemaFields.authID).toBe(String);
+        expect(schemaFields.last_scraped_date).toBe(Date);
+        expect(schemaFields.auth_id).toBe(String);
     });
 });
