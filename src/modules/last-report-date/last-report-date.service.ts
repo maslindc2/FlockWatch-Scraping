@@ -1,18 +1,18 @@
-import { LastReportDateModel } from "../../models/last-report-date-model";
+import { LastReportDateModel } from "./last-report-date.model";
 
 class LastReportDateService {
     // This will query the last report date model and only return the last scraped date field
     public async getLastScrapedDate() {
         return LastReportDateModel.getModel
-            .findOne({ lastScrapedDate: { $exists: true } })
-            .select("-_id -__v -authID")
+            .findOne({ last_scraped_date: { $exists: true } })
+            .select("-_id -__v -auth_id")
             .lean();
     }
     // Only get the authID
     public async getAuthID() {
         return LastReportDateModel.getModel
-            .findOne({ authID: { $exists: true } })
-            .select("-_id -__v -lastScrapedDate")
+            .findOne({ auth_id: { $exists: true } })
+            .select("-_id -__v -last_scraped_date")
             .lean();
     }
     /**
@@ -25,8 +25,8 @@ class LastReportDateService {
             .lean();
         if (!existingRecord) {
             const modelObj = {
-                lastScrapedDate: new Date(),
-                authID: crypto.randomUUID(),
+                last_scraped_date: new Date(),
+                auth_id: crypto.randomUUID(),
             };
             return await LastReportDateModel.getModel.create(modelObj);
         } else {

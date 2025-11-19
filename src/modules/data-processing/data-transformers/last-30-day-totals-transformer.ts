@@ -1,5 +1,6 @@
-import { ILast30Days } from "../../../interfaces/i-last-30-days-stats";
-import { logger } from "../../winston-logger";
+import { logger } from "../../../utils/winston-logger";
+import { Last30Days } from "../last-30-days.interface";
+
 
 /**
  * Transforms the 30-day summary data from the USDA CSVs into
@@ -16,7 +17,7 @@ class Last30DaysTransformer {
     public static transformData(
         affectedTotalsData: Record<string, string>[],
         confirmedFlockTotals: Record<string, string>
-    ): ILast30Days {
+    ): Last30Days {
         try {
             if (!affectedTotalsData?.length) {
                 throw new Error("Missing affectedTotalsData");
@@ -46,29 +47,29 @@ class Last30DaysTransformer {
             if (!commercialFlocksStr)
                 throw new Error("Missing Commercial Flocks (last 30 days)");
 
-            const periodName = "last30Days";
-            const totalBirdsAffected = this.parseNumber(birdsAffectedStr);
-            const totalFlocksAffected = this.parseNumber(totalFlocksStr);
-            const totalBackyardFlocksAffected =
+            const period_name = "last_30_days";
+            const total_birds_affected = this.parseNumber(birdsAffectedStr);
+            const total_flocks_affected = this.parseNumber(totalFlocksStr);
+            const total_backyard_flocks_affected =
                 this.parseNumber(backyardFlocksStr);
-            const totalCommercialFlocksAffected =
+            const total_commercial_flocks_affected =
                 this.parseNumber(commercialFlocksStr);
 
-            if (isNaN(totalBirdsAffected))
+            if (isNaN(total_birds_affected))
                 throw new Error("Invalid Birds Affected number");
-            if (isNaN(totalFlocksAffected))
+            if (isNaN(total_flocks_affected))
                 throw new Error("Invalid Total Flocks number");
-            if (isNaN(totalBackyardFlocksAffected))
+            if (isNaN(total_backyard_flocks_affected))
                 throw new Error("Invalid Backyard Flocks number");
-            if (isNaN(totalCommercialFlocksAffected))
+            if (isNaN(total_commercial_flocks_affected))
                 throw new Error("Invalid Commercial Flocks number");
 
             return {
-                periodName,
-                totalBirdsAffected,
-                totalFlocksAffected,
-                totalBackyardFlocksAffected,
-                totalCommercialFlocksAffected,
+                period_name,
+                total_birds_affected,
+                total_flocks_affected,
+                total_backyard_flocks_affected,
+                total_commercial_flocks_affected,
             };
         } catch (error) {
             logger.error(

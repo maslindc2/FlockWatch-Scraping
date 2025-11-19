@@ -1,14 +1,15 @@
 import { Browser, Page, chromium, selectors } from "playwright";
 import axios from "axios";
-import { logger } from "../utils/winston-logger";
+import { logger } from "../../utils/winston-logger";
 
-interface IUSDAScrapingConfig {
+
+type USDAScrapingConfig = {
     headless: boolean;
     testIdAttribute: string;
     scrapeURL: string;
 }
 
-interface ILast30DaysCSVs {
+type Last30DaysCSVs = {
     affectedTotalsCSV: SharedArrayBuffer;
     confirmedFlocksTotalCSV: SharedArrayBuffer;
 }
@@ -23,7 +24,7 @@ class USDAScrapingService {
      * testIdAttribute: We can use the testId to target buttons that Tableau attempts to block from scrapers clicking on them
      * scrapeURL: This is the URL that goes directly to the Tableau Data Widget.
      */
-    private readonly config: IUSDAScrapingConfig = {
+    private readonly config: USDAScrapingConfig = {
         headless: false,
         testIdAttribute: "data-tb-test-id",
         scrapeURL: process.env.SCRAPE_URL!,
@@ -34,7 +35,7 @@ class USDAScrapingService {
      * @returns Returns a browser and page instance
      */
     private async setupBrowser(
-        config: IUSDAScrapingConfig
+        config: USDAScrapingConfig
     ): Promise<{ browser: Browser; page: Page }> {
         selectors.setTestIdAttribute(config.testIdAttribute);
         const browser = await chromium.launch({ headless: config.headless });
@@ -155,7 +156,7 @@ class USDAScrapingService {
      * Scraped two key files for this: Affected Totals.csv and Confirmed Flock Totals.csv
      * @returns an object of type Last30DaysCSVs where the each key is the corresponding CSV (i.e. affectedTotalsCSV is the Affected Totals.csv)
      */
-    public async getLast30Days(): Promise<ILast30DaysCSVs> {
+    public async getLast30Days(): Promise<Last30DaysCSVs> {
         try {
             // Set up the browser instance using the config from above
             const { browser: browserInstance, page } = await this.setupBrowser(
@@ -229,4 +230,4 @@ class USDAScrapingService {
         }
     }
 }
-export { USDAScrapingService, ILast30DaysCSVs };
+export { USDAScrapingService, Last30DaysCSVs };

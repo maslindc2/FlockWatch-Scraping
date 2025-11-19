@@ -1,5 +1,5 @@
-import { IFlockCasesByState } from "../../../interfaces/i-flock-cases-by-state";
-import { logger } from "../../winston-logger";
+import { logger } from "../../../utils/winston-logger";
+import { FlockCasesByState } from "../flock-cases-by-state.interface";
 
 /**
  * Flock Watch uses transformers to transform an array of data into the fields and datatype required for a particular model.
@@ -14,81 +14,81 @@ class FlockCasesByStateTransformer {
      */
     public static transformData(
         parsedData: Record<string, string>[]
-    ): IFlockCasesByState[] {
-        const transformedData: IFlockCasesByState[] = [];
+    ): FlockCasesByState[] {
+        const transformedData: FlockCasesByState[] = [];
         parsedData.forEach((row, index) => {
             try {
                 // Define the JS object that each state's fields will contain
                 const {
-                    ["State Abbreviation"]: stateAbbreviation,
+                    ["State Abbreviation"]: state_abbreviation,
                     ["State Name"]: state,
-                    ["Backyard Flocks"]: backyardFlocksStr,
-                    ["Commercial Flocks"]: commercialFlocksStr,
-                    ["Birds Affected"]: birdsAffectedStr,
-                    ["Total Flocks"]: totalFlocksStr,
-                    ["Latitude (generated)"]: latitudeStr,
-                    ["Longitude (generated)"]: longitudeStr,
-                    ["Last Reported Detection Text"]: lastReportedDetectionStr,
+                    ["Backyard Flocks"]: backyard_flocks_str,
+                    ["Commercial Flocks"]: commercial_flocks_str,
+                    ["Birds Affected"]: birds_affected_str,
+                    ["Total Flocks"]: total_flocks_str,
+                    ["Latitude (generated)"]: latitude_str,
+                    ["Longitude (generated)"]: longitude_str,
+                    ["Last Reported Detection Text"]: last_reported_detection_str,
                 } = row;
 
                 // Check to make sure all of the required fields have been extracted and that they exist
-                if (!stateAbbreviation)
+                if (!state_abbreviation)
                     throw new Error("Missing State Abbreviation");
                 if (!state) throw new Error("Missing State Name");
-                if (!backyardFlocksStr)
+                if (!backyard_flocks_str)
                     throw new Error("Missing Backyard Flocks");
-                if (!commercialFlocksStr)
+                if (!commercial_flocks_str)
                     throw new Error("Missing Commercial Flocks");
-                if (!birdsAffectedStr)
+                if (!birds_affected_str)
                     throw new Error("Missing Birds Affected");
-                if (!totalFlocksStr) throw new Error("Missing Total Flocks");
-                if (!latitudeStr) throw new Error("Missing Latitude");
-                if (!longitudeStr) throw new Error("Missing Longitude");
-                if (!lastReportedDetectionStr)
+                if (!total_flocks_str) throw new Error("Missing Total Flocks");
+                if (!latitude_str) throw new Error("Missing Latitude");
+                if (!longitude_str) throw new Error("Missing Longitude");
+                if (!last_reported_detection_str)
                     throw new Error("Missing Last Reported Detection Text");
 
                 // Parse the fields into the expected data type
-                const backyardFlocks = Number(
-                    backyardFlocksStr.replace(/,/g, "")
+                const backyard_flocks = Number(
+                    backyard_flocks_str.replace(/,/g, "")
                 );
-                const commercialFlocks = Number(
-                    commercialFlocksStr.replace(/,/g, "")
+                const commercial_flocks = Number(
+                    commercial_flocks_str.replace(/,/g, "")
                 );
-                const birdsAffected = Number(
-                    birdsAffectedStr.replace(/,/g, "")
+                const birds_affected = Number(
+                    birds_affected_str.replace(/,/g, "")
                 );
-                const totalFlocks = Number(totalFlocksStr.replace(/,/g, ""));
-                const latitude = parseFloat(latitudeStr);
-                const longitude = parseFloat(longitudeStr);
+                const total_flocks = Number(total_flocks_str.replace(/,/g, ""));
+                const latitude = parseFloat(latitude_str);
+                const longitude = parseFloat(longitude_str);
 
                 // If we failed to parse any of the above fields correctly and instead got NaN throw an error
-                if (isNaN(backyardFlocks))
+                if (isNaN(backyard_flocks))
                     throw new Error("Invalid Backyard Flocks number");
-                if (isNaN(commercialFlocks))
+                if (isNaN(commercial_flocks))
                     throw new Error("Invalid Commercial Flocks number");
-                if (isNaN(birdsAffected))
+                if (isNaN(birds_affected))
                     throw new Error("Invalid Birds Affected number");
-                if (isNaN(totalFlocks))
+                if (isNaN(total_flocks))
                     throw new Error("Invalid Total Flocks number");
                 if (isNaN(latitude)) throw new Error("Invalid Latitude");
                 if (isNaN(longitude)) throw new Error("Invalid Longitude");
 
                 // Remove the last reported detect an restructure it to convert to JS's Date datatype
-                const lastReportedDate = this.extractDate(
-                    lastReportedDetectionStr
+                const last_reported_detection = this.extractDate(
+                    last_reported_detection_str
                 );
 
                 // Push all the values onto our JS object
                 transformedData.push({
-                    stateAbbreviation,
+                    state_abbreviation,
                     state,
-                    backyardFlocks,
-                    commercialFlocks,
-                    birdsAffected,
-                    totalFlocks,
+                    backyard_flocks,
+                    commercial_flocks,
+                    birds_affected,
+                    total_flocks,
                     latitude,
                     longitude,
-                    lastReportedDate,
+                    last_reported_detection,
                 });
             } catch (error) {
                 logger.error(

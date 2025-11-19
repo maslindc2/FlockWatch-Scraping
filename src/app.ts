@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from "express";
-import scraperRoutes from "./routes/scraper-routes";
-import { DatabaseService } from "./services/database-service";
+import scraperRoutes from "./routes/scraper.routes";
+import { DatabaseService } from "./db/database.service";
 import helmet from "helmet";
 
 class App {

@@ -1,13 +1,12 @@
-import { CSVParser } from "../utils/csv-parser/csv-parser";
-import { FlockCasesByStateTransformer } from "../utils/csv-parser/transformers/flock-cases-by-state-transformer";
-import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
-import { logger } from "../utils/winston-logger";
-import { ILast30DaysCSVs } from "./usda-scraping-service";
-import fs from "fs";
-import { ILast30Days } from "../interfaces/i-last-30-days-stats";
-import { Last30DaysTransformer } from "../utils/csv-parser/transformers/last-30-day-totals-transformer";
+import { CSVParser } from "./csv/csv-parser";
+import { FlockCasesByStateTransformer } from "./data-transformers/flock-cases-by-state-transformer";
+import { Last30DaysTransformer } from "./data-transformers/last-30-day-totals-transformer";
+import { Last30DaysCSVs } from "../scraper/usda-scraping.service";
+import { FlockCasesByState } from "./flock-cases-by-state.interface";
+import { Last30Days } from "./last-30-days.interface";
+import { logger } from "../../utils/winston-logger";
 
-interface ParseCSVConfig {
+type ParseCSVConfig = {
     csvHeaders: string[];
     delimiter: string;
     startFromRow: number;
@@ -39,7 +38,7 @@ class DataProcessor {
     // Parse the CSV and assemble the data into a JS Array matching our interface, and return it
     public async processMapComparisonsCSV(
         mapComparisonCSV: any
-    ): Promise<IFlockCasesByState[]> {
+    ): Promise<FlockCasesByState[]> {
         try {
             // Define the columns that we will be reading from
             const customHeaders: string[] = [
@@ -75,7 +74,7 @@ class DataProcessor {
             );
 
             // Transform the data after it's been filtered to match the expected interface IFlockCasesByState
-            const transformedData: IFlockCasesByState[] =
+            const transformedData: FlockCasesByState[] =
                 FlockCasesByStateTransformer.transformData(dataFiltered);
 
             logger.info("Finished processing CSVs!");
@@ -89,8 +88,8 @@ class DataProcessor {
 
     // Parse the CSVs required for the last 30 day totals and assemble and return the data
     public async processLast30DayTotalsCSVs(
-        last30DayTotalsCSVs: ILast30DaysCSVs
-    ): Promise<ILast30Days[]> {
+        last30DayTotalsCSVs: Last30DaysCSVs
+    ): Promise<Last30Days[]> {
         const affectedTotalsCSV = last30DayTotalsCSVs.affectedTotalsCSV;
 
         const affectedTotalsHeaders: string[] = [
@@ -134,7 +133,7 @@ class DataProcessor {
         }
 
         // Send parsed data to transformer and then return that transformed data
-        const transformedData: ILast30Days =
+        const transformedData: Last30Days =
             Last30DaysTransformer.transformData(
                 affectedTotalsData,
                 confirmedFlockTotals

@@ -1,13 +1,10 @@
 import { Router, Request, Response } from "express";
-import { DataController } from "../controllers/data-controller";
+import { DataController } from "../controllers/data.controller";
 import { logger } from "../utils/winston-logger";
-import { DataProcessor } from "../services/data-processor";
-import {
-    ILast30DaysCSVs,
-    USDAScrapingService,
-} from "../services/usda-scraping-service";
-import { ILast30Days } from "../interfaces/i-last-30-days-stats";
-import { IFlockCasesByState } from "../interfaces/i-flock-cases-by-state";
+import { Last30Days } from "../modules/data-processing/last-30-days.interface";
+import { FlockCasesByState } from "../modules/data-processing/flock-cases-by-state.interface";
+import { DataProcessor } from "../modules/data-processing/data-processor";
+import { Last30DaysCSVs, USDAScrapingService } from "../modules/scraper/usda-scraping.service";
 
 const router = Router();
 
@@ -33,25 +30,25 @@ router.post("/process-data", async (req: Request, res: Response) => {
             // Get the All Time US Data for each state
             const mapComparisonCSV = await usdaScrapeService.getAllTimeTotals();
             // Get the last 30 day totals for the entire United States
-            const last30DayTotalsCSVs: ILast30DaysCSVs =
+            const last30DayTotalsCSVs: Last30DaysCSVs =
                 await usdaScrapeService.getLast30Days();
             // Create a data processor object
             const dataProcessor = new DataProcessor();
 
             // Process the mapComparisons CSV
-            const flockCasesByState: IFlockCasesByState[] =
+            const flockCasesByState: FlockCasesByState[] =
                 await dataProcessor.processMapComparisonsCSV(mapComparisonCSV);
 
             // Process the last 30 day totals
-            const periodSummaries: ILast30Days[] =
+            const periodSummaries: Last30Days[] =
                 await dataProcessor.processLast30DayTotalsCSVs(
                     last30DayTotalsCSVs
                 );
 
             // Assemble an object for returning to the client
             const responseData = {
-                flockCasesByState: flockCasesByState,
-                periodSummaries: periodSummaries,
+                flock_cases_by_state: flockCasesByState,
+                period_summaries: periodSummaries,
             };
             res.json(responseData);
         } catch (error) {
@@ -60,7 +57,7 @@ router.post("/process-data", async (req: Request, res: Response) => {
         }
     } else {
         logger.error(
-            `Invalid authID from IP ${req.ip}, who sent the auth ID ${receivedAuthID}!`
+            `Invalid Auth ID from IP ${req.ip}, who sent the auth ID ${receivedAuthID}!`
         );
         res.sendStatus(403);
     }
