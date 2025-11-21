@@ -1,7 +1,6 @@
 import { logger } from "../../../utils/winston-logger";
 import { Last30Days } from "../last-30-days.interface";
 
-
 /**
  * Transforms the 30-day summary data from the USDA CSVs into
  * a structured object for use in the Flock Watch server models.

@@ -10,7 +10,7 @@ type ParseCSVConfig = {
     csvHeaders: string[];
     delimiter: string;
     startFromRow: number;
-}
+};
 
 /**
  * This class is responsible for using the CSV headers to extract data and then transform it into an object that Flock Watch Server can store.
@@ -133,11 +133,10 @@ class DataProcessor {
         }
 
         // Send parsed data to transformer and then return that transformed data
-        const transformedData: Last30Days =
-            Last30DaysTransformer.transformData(
-                affectedTotalsData,
-                confirmedFlockTotals
-            );
+        const transformedData: Last30Days = Last30DaysTransformer.transformData(
+            affectedTotalsData,
+            confirmedFlockTotals
+        );
 
         return [transformedData];
     }

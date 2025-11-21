@@ -26,7 +26,9 @@ class App {
         this.app.use(helmet());
 
         if (process.env.NODE_ENV === "development") {
-            logger.info("Currently in development mode, CORS allows all origins!");
+            logger.info(
+                "Currently in development mode, CORS allows all origins!"
+            );
             this.app.use(
                 cors({
                     origin: "*",
@@ -34,7 +36,7 @@ class App {
                     allowedHeaders: ["Content-Type"],
                 })
             );
-        }else{
+        } else {
             this.app.use(
                 "/scraper",
                 cors({
@@ -54,7 +56,7 @@ class App {
                     },
                     // Only allow POST methods
                     methods: ["POST"],
-                    allowedHeaders: ["Authorization","Content-Type"],
+                    allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
         }

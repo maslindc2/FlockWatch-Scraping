@@ -118,7 +118,9 @@ describe("Data Processor Unit Test", () => {
             throw new Error("CSV Processing Failed!");
         });
         const dataProcessor = new DataProcessor();
-        await expect(dataProcessor.processMapComparisonsCSV(new ArrayBuffer(1024))).rejects.toThrow(
+        await expect(
+            dataProcessor.processMapComparisonsCSV(new ArrayBuffer(1024))
+        ).rejects.toThrow(
             "Failed to process CSV Data: Error: CSV Processing Failed!"
         );
     });

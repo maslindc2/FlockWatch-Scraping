@@ -4,7 +4,10 @@ import { logger } from "../utils/winston-logger";
 import { Last30Days } from "../modules/data-processing/last-30-days.interface";
 import { FlockCasesByState } from "../modules/data-processing/flock-cases-by-state.interface";
 import { DataProcessor } from "../modules/data-processing/data-processor";
-import { Last30DaysCSVs, USDAScrapingService } from "../modules/scraper/usda-scraping.service";
+import {
+    Last30DaysCSVs,
+    USDAScrapingService,
+} from "../modules/scraper/usda-scraping.service";
 
 const router = Router();
 

@@ -2,17 +2,16 @@ import { Browser, Page, chromium, selectors } from "playwright";
 import axios from "axios";
 import { logger } from "../../utils/winston-logger";
 
-
 type USDAScrapingConfig = {
     headless: boolean;
     testIdAttribute: string;
     scrapeURL: string;
-}
+};
 
 type Last30DaysCSVs = {
     affectedTotalsCSV: SharedArrayBuffer;
     confirmedFlocksTotalCSV: SharedArrayBuffer;
-}
+};
 
 class USDAScrapingService {
     private browser!: Browser;

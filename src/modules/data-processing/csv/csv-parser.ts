@@ -1,7 +1,6 @@
 import { parse } from "csv-parse/sync";
 import { logger } from "../../../utils/winston-logger";
 
-
 export class CSVParser {
     /**
      *

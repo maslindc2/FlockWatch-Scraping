@@ -28,7 +28,8 @@ class FlockCasesByStateTransformer {
                     ["Total Flocks"]: total_flocks_str,
                     ["Latitude (generated)"]: latitude_str,
                     ["Longitude (generated)"]: longitude_str,
-                    ["Last Reported Detection Text"]: last_reported_detection_str,
+                    ["Last Reported Detection Text"]:
+                        last_reported_detection_str,
                 } = row;
 
                 // Check to make sure all of the required fields have been extracted and that they exist
