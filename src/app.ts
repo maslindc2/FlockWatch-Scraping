@@ -47,7 +47,7 @@ class App {
                             return;
                         }
                         // Allowed origins array
-                        const allowedOrigins = [process.env.FRONTEND_DOMAIN];
+                        const allowedOrigins = [process.env.SERVER_DOMAIN];
                         if (allowedOrigins.includes(origin)) {
                             callback(null, true);
                             return;
@@ -59,6 +59,7 @@ class App {
                     allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
+            
         }
 
         // Set the default permissions for this service if accessed by browser

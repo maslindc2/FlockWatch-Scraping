@@ -48,6 +48,12 @@ class FlockCasesByStateTransformer {
                 if (!last_reported_detection_str)
                     throw new Error("Missing Last Reported Detection Text");
 
+                // Currently we are not supporting Puerto Rico, due to it not fitting entirely on the map
+                // I will be working with the d3 map to support it in future updates
+                if(state_abbreviation === "PR"){
+                    return;
+                }
+
                 // Parse the fields into the expected data type
                 const backyard_flocks = Number(
                     backyard_flocks_str.replace(/,/g, "")

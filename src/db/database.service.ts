@@ -10,6 +10,7 @@ class DatabaseService {
         try {
             await mongoose.connect(dbConnectionString);
             logger.info("MongoDB connected successfully.");
+            logger.info("Flock Watch Scraping is ready!");
         } catch (error) {
             logger.error("Error connecting to MongoDB:", error);
             throw new Error("MongoDB connection failed.");
