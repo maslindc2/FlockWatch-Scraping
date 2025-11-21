@@ -1,6 +1,6 @@
-import { LastReportDateService } from "../../../src/services/model-services/last-report-date-service";
-import { ILastReportDate } from "../../../src/interfaces/i-last-report-date";
-import { LastReportDateModel } from "../../../src/models/last-report-date-model";
+import { LastReportDateService } from "../../../src/modules/last-report-date/last-report-date.service";
+import { LastReportDate } from "../../../src/modules/last-report-date/last-report-date.interface";
+import { LastReportDateModel } from "../../../src/modules/last-report-date/last-report-date.model";
 import * as Mongoose from "mongoose";
 
 import dotenv from "dotenv";
@@ -26,8 +26,8 @@ describe("LastReportDateService Integration", () => {
 
     it("should initialize the database with a new data entry", async () => {
         const expectedModelObj = {
-            lastScrapedDate: expect.any(Date),
-            authID: expect.any(String),
+            last_scraped_date: expect.any(Date),
+            auth_id: expect.any(String),
         };
 
         // Initialize the database like it would on startup
@@ -50,7 +50,7 @@ describe("LastReportDateService Integration", () => {
             await lastReportDateService.initializeLastReportDate();
         // Since we use Mongoose we need to strip the proxied object portion from our result
         // This is done by Stringify and then parsing.
-        const stripProxiedObject = (obj: ILastReportDate) =>
+        const stripProxiedObject = (obj: LastReportDate) =>
             JSON.parse(JSON.stringify(obj));
 
         // findOne should be called twice as we are in fact calling it twice

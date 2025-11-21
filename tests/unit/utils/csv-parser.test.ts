@@ -1,4 +1,4 @@
-import { CSVParser } from "../../../src/utils/csv-parser/csv-parser";
+import { CSVParser } from "../../../src/modules/data-processing/csv/csv-parser";
 describe("Test CSVParser class", () => {
     it("should return an empty array when an empty string is provided for the fileContent", () => {
         const delimiter = "\t";

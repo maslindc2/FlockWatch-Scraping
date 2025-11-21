@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { logger } from "../winston-logger";
+import { logger } from "../../../utils/winston-logger";
 
 export class ReadCSV {
     /**

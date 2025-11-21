@@ -1,4 +1,4 @@
-import { LastReportDateService } from "../services/model-services/last-report-date-service";
+import { LastReportDateService } from "../modules/last-report-date/last-report-date.service";
 import { logger } from "../utils/winston-logger";
 
 class DataController {
@@ -10,7 +10,7 @@ class DataController {
     public async getServerAuthID(): Promise<string> {
         try {
             const data = await this.lastReportDateService.getAuthID();
-            return data!.authID;
+            return data!.auth_id;
         } catch (error) {
             logger.error(`Error fetching Last Report Date: ${error}`);
             return "";
