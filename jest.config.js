@@ -27,5 +27,16 @@ module.exports = {
                 "^.+.tsx?$": ["ts-jest", {}],
             },
         },
+        {
+            displayName: "system",
+            preset: "ts-jest",
+            testEnvironment: "node",
+            testMatch: ["<rootDir>/tests/system/**/*.test.ts"],
+            testPathIgnorePatterns: [".stryker-temp/"],
+            setupFilesAfterEnv: ["<rootDir>/setup-jest.js"],
+            transform: {
+                "^.+.tsx?$": ["ts-jest", {}],
+            },
+        },
     ],
 };
