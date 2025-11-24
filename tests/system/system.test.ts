@@ -1,9 +1,10 @@
 import { LastReportDateModel } from "../../src/modules/last-report-date/last-report-date.model";
+import { FlockCasesByState } from "../../src/modules/data-processing/flock-cases-by-state.interface";
 import {App} from "../../src/app";
 import dotenv from "dotenv";
 import * as Mongoose from "mongoose";
 import request from "supertest";
-
+import {stateList} from "../utils/state-list";
 
 dotenv.config();
 
@@ -54,17 +55,40 @@ describe("System Testing FW Scraper", () => {
             expect(scraperResponse).toHaveProperty("period_summaries");
         })
 
-        it("Period summaries should exist and only contain 1 object in the response array when scrapers are successful", async() =>{
+        it("Period summaries should exist and only contain 1 object in the response array when scrapers are successful", async () =>{
             expect(scraperResponse).toHaveProperty("period_summaries");
             expect(scraperResponse.period_summaries).toHaveLength(1);
         });
-        it("Period summaries last_30_days should have the expected results", async() => {
+        it("Period summaries last_30_days should have the expected results when scrapers are successful", async () => {
             expect(scraperResponse.period_summaries[0]).toHaveProperty("period_name");
             expect(scraperResponse.period_summaries[0].period_name).toEqual("last_30_days");
             expect(scraperResponse.period_summaries[0].total_birds_affected).toBeGreaterThan(0);
             expect(scraperResponse.period_summaries[0].total_flocks_affected).toBeGreaterThan(0);
             expect(scraperResponse.period_summaries[0].total_backyard_flocks_affected).toBeGreaterThan(0);
-        })
+        });
+        it("Flock Cases by State should have all expected US States when scrapers are successful", async () => {
+            const invalidStates = scraperResponse.flock_cases_by_state.filter((resState:FlockCasesByState) => {
+                !stateList.some(state => {
+                    resState.state === state.name && 
+                    resState.state_abbreviation === state.state_abbreviation
+                });
+            });
+            expect(invalidStates).toEqual([]);
+        });
+        it("Flock Cases by State should have all expected fields and they should have the appropriate value when scrapers are successful", async() => {
+            const invalidStates = scraperResponse.flock_cases_by_state.filter((s: FlockCasesByState) =>
+                !s.state ||
+                !s.state_abbreviation ||
+                s.backyard_flocks < 0 ||
+                s.commercial_flocks < 0 ||
+                s.birds_affected < 0 ||
+                !s.latitude ||
+                !s.longitude ||
+                !s.last_reported_detection
+            );
+            expect(invalidStates).toEqual([]);
+        });
+
     });
     afterAll(async () => {
         // Drop the database we made for flock cases so we can start new for the next test
