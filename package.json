@@ -6,6 +6,7 @@
         "test": "jest --coverage",
         "test:unit": "jest --testPathPattern=tests/unit",
         "test:integration": "jest --testPathPattern=tests/integration",
+        "test:system": "jest --testPathPattern=tests/system",
         "nodemon": "nodemon ./src/server.ts",
         "build": "tsc --project tsconfig.json",
         "dev": "npm run build && node ./dist/server.js",
