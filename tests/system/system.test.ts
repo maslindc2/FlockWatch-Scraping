@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import * as Mongoose from "mongoose";
 import request from "supertest";
 import {stateList} from "../utils/state-list";
+import { Last30Days } from "../../src/modules/data-processing/last-30-days.interface";
 
 dotenv.config();
 
@@ -13,7 +14,6 @@ describe("System Testing FW Scraper", () => {
     let scraperResponse: any;
     jest.setTimeout(5 * 60 * 1000);
     describe("Should collect all infection data from USDA and return expected structure", () => {
-        
         //Create last report date model and generate an auth ID to use
         beforeAll(async () => {
             try {
@@ -35,7 +35,7 @@ describe("System Testing FW Scraper", () => {
                 authID = modelObj.auth_id;
 
                 await LastReportDateModel.getModel.create(modelObj);
-
+                
             } catch (error) {
                 console.error("Error connecting to MongoDB:", error);
                 throw new Error("MongoDB connection failed");
@@ -87,6 +87,29 @@ describe("System Testing FW Scraper", () => {
                 !s.last_reported_detection
             );
             expect(invalidStates).toEqual([]);
+        });
+        it("Flock Cases by state should all be the expected type when scrapers are successful", async () => {
+            const invalidTypeStates = scraperResponse.flock_cases_by_state.filter((s: FlockCasesByState) =>
+                !((typeof s.state) === "string") ||
+                !((typeof s.state_abbreviation) === "string") ||
+                !((typeof s.backyard_flocks) === "number") ||
+                !((typeof s.commercial_flocks) === "number") ||
+                !((typeof s.birds_affected) === "number") ||
+                !((typeof s.latitude) === "number") ||
+                !((typeof s.longitude) === "number") ||
+                !((typeof s.last_reported_detection) === "string")
+            );
+            expect(invalidTypeStates).toEqual([]);
+        });
+        it("Period Summaries last_30_days should all be the expected type when scrapers are successful", async () => {
+            const invalidTypeLast30Days = scraperResponse.period_summaries.filter((s: Last30Days) =>
+                !((typeof s.period_name) === "string") ||
+                !((typeof s.total_birds_affected) === "number") ||
+                !((typeof s.total_flocks_affected) === "number") ||
+                !((typeof s.total_backyard_flocks_affected) === "number") ||
+                !((typeof s.total_commercial_flocks_affected) === "number")
+            );
+            expect(invalidTypeLast30Days).toEqual([]);
         });
 
     });

@@ -32,8 +32,8 @@ class App {
             this.app.use(
                 cors({
                     origin: "*",
-                    methods: ["GET"],
-                    allowedHeaders: ["Content-Type"],
+                    methods: ["POST"],
+                    allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
         } else {
@@ -54,7 +54,6 @@ class App {
                         }
                         callback(new Error("Not allowed by CORS"));
                     },
-                    // Only allow POST methods
                     methods: ["POST"],
                     allowedHeaders: ["Authorization", "Content-Type"],
                 })
