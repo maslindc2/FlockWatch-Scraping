@@ -32,8 +32,8 @@ class App {
             this.app.use(
                 cors({
                     origin: "*",
-                    methods: ["GET"],
-                    allowedHeaders: ["Content-Type"],
+                    methods: ["POST"],
+                    allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
         } else {
@@ -47,14 +47,13 @@ class App {
                             return;
                         }
                         // Allowed origins array
-                        const allowedOrigins = [process.env.FRONTEND_DOMAIN];
+                        const allowedOrigins = [process.env.SERVER_DOMAIN];
                         if (allowedOrigins.includes(origin)) {
                             callback(null, true);
                             return;
                         }
                         callback(new Error("Not allowed by CORS"));
                     },
-                    // Only allow POST methods
                     methods: ["POST"],
                     allowedHeaders: ["Authorization", "Content-Type"],
                 })

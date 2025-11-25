@@ -24,7 +24,7 @@ class USDAScrapingService {
      * scrapeURL: This is the URL that goes directly to the Tableau Data Widget.
      */
     private readonly config: USDAScrapingConfig = {
-        headless: false,
+        headless: true,
         testIdAttribute: "data-tb-test-id",
         scrapeURL: process.env.SCRAPE_URL!,
     };
