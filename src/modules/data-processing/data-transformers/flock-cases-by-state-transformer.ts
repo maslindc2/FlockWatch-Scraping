@@ -50,7 +50,7 @@ class FlockCasesByStateTransformer {
 
                 // Currently we are not supporting Puerto Rico, due to it not fitting entirely on the map
                 // I will be working with the d3 map to support it in future updates
-                if(state_abbreviation === "PR"){
+                if (state_abbreviation === "PR") {
                     return;
                 }
 

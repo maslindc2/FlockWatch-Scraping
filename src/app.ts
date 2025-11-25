@@ -58,7 +58,6 @@ class App {
                     allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
-            
         }
 
         // Set the default permissions for this service if accessed by browser
