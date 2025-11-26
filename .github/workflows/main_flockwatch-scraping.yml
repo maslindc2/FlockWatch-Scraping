@@ -30,7 +30,7 @@ jobs:
           npm run test:unit
           npm run test:integration
         env: 
-          MONGODB_URI: ${{secrets.MONGODB_TEST_DB}}
+          MONGODB_URI: ${{ secrets.MONGODB_TEST_DB }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
