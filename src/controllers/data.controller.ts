@@ -12,8 +12,24 @@ class DataController {
             const data = await this.lastReportDateService.getAuthID();
             return data!.auth_id;
         } catch (error) {
-            logger.error(`Error fetching Last Report Date: ${error}`);
+            logger.error(`Error fetching Auth ID: ${error}`);
             return "";
+        }
+    }
+    public async getLastScrapedDate(): Promise<string> {
+        try {
+            const data = await this.lastReportDateService.getLastScrapedDate();
+            if(!data){
+                throw new Error("Last Scraped Date not found!");
+            }
+            const date = data.last_scraped_date;
+            if(!date){
+                throw new Error("Last Scraped Date document exists but no date field!");
+            }
+            return String(date);
+        } catch (error) {
+            logger.error(`Error fetching Last Scraped Date: ${error}`);
+            throw error;
         }
     }
 }

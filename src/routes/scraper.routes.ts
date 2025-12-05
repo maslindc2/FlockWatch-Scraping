@@ -4,10 +4,12 @@ import { logger } from "../utils/winston-logger";
 import { Last30Days } from "../modules/data-processing/last-30-days.interface";
 import { FlockCasesByState } from "../modules/data-processing/flock-cases-by-state.interface";
 import { DataProcessor } from "../modules/data-processing/data-processor";
+import { UpdateData } from "../modules/update-data/update-data.service";
 import {
     Last30DaysCSVs,
     USDAScrapingService,
 } from "../modules/scraper/usda-scraping.service";
+import { ScraperController } from "../controllers/scraper.controller";
 
 const router = Router();
 
@@ -28,32 +30,9 @@ router.post("/process-data", async (req: Request, res: Response) => {
         // Report that we are scraping
         logger.info(`Received valid scrape request! Starting job...`);
         try {
-            // Create the scraping service
-            const usdaScrapeService = new USDAScrapingService();
-            // Get the All Time US Data for each state
-            const mapComparisonCSV = await usdaScrapeService.getAllTimeTotals();
-            // Get the last 30 day totals for the entire United States
-            const last30DayTotalsCSVs: Last30DaysCSVs =
-                await usdaScrapeService.getLast30Days();
-            // Create a data processor object
-            const dataProcessor = new DataProcessor();
-
-            // Process the mapComparisons CSV
-            const flockCasesByState: FlockCasesByState[] =
-                await dataProcessor.processMapComparisonsCSV(mapComparisonCSV);
-
-            // Process the last 30 day totals
-            const periodSummaries: Last30Days[] =
-                await dataProcessor.processLast30DayTotalsCSVs(
-                    last30DayTotalsCSVs
-                );
-
-            // Assemble an object for returning to the client
-            const responseData = {
-                flock_cases_by_state: flockCasesByState,
-                period_summaries: periodSummaries,
-            };
-            res.json(responseData);
+            const controller = new ScraperController();
+            const flockData = await controller.runScrapeJob();
+            res.json(flockData);
         } catch (error) {
             logger.error("Error processing data: ", error);
             res.sendStatus(500).json({ error: "Failed to process data" });
@@ -64,5 +43,12 @@ router.post("/process-data", async (req: Request, res: Response) => {
         );
         res.sendStatus(403);
     }
+});
+
+router.get("/manual-update", async (req: Request, res: Response) => {
+    // Check if we are out of date and if so run scrape job and send it to FW Server
+    const dataUpdate = new UpdateData();
+    const result = await dataUpdate.syncIfOutdated();
+    res.json(result);
 });
 export default router;
