@@ -1,14 +1,7 @@
 import { Router, Request, Response } from "express";
 import { DataController } from "../controllers/data.controller";
 import { logger } from "../utils/winston-logger";
-import { Last30Days } from "../modules/data-processing/last-30-days.interface";
-import { FlockCasesByState } from "../modules/data-processing/flock-cases-by-state.interface";
-import { DataProcessor } from "../modules/data-processing/data-processor";
-import { UpdateData } from "../modules/update-data/update-data.service";
-import {
-    Last30DaysCSVs,
-    USDAScrapingService,
-} from "../modules/scraper/usda-scraping.service";
+
 import { ScraperController } from "../controllers/scraper.controller";
 
 const router = Router();
@@ -45,10 +38,4 @@ router.post("/process-data", async (req: Request, res: Response) => {
     }
 });
 
-router.get("/manual-update", async (req: Request, res: Response) => {
-    // Check if we are out of date and if so run scrape job and send it to FW Server
-    const dataUpdate = new UpdateData();
-    const result = await dataUpdate.syncIfOutdated();
-    res.json(result);
-});
 export default router;

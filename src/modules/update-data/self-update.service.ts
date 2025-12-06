@@ -1,13 +1,15 @@
 import { DataController } from "../../controllers/data.controller"
 import { FlockData, ScraperController } from "../../controllers/scraper.controller";
+import { logger } from "../../utils/winston-logger";
 
-class UpdateData {
-    public async syncIfOutdated(): Promise<FlockData | void> {
+class SelfUpdate {
+    public async updateIfOutdated(): Promise<FlockData | void> {
         const dataController = new DataController();
         const lastDateUpdated = await dataController.getLastScrapedDate();
         if(!this.isOutdated(lastDateUpdated)){
-            return;    
+            return;
         }
+        logger.info("DB is outdated gathering latest data!");
         const controller = new ScraperController();
         const flockData = await controller.runScrapeJob();
         return flockData;
@@ -20,4 +22,4 @@ class UpdateData {
     }
 }
 
-export {UpdateData}
+export {SelfUpdate}

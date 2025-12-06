@@ -11,8 +11,6 @@ type FlockData = {
 
 class ScraperController {
     public async runScrapeJob(): Promise<FlockData> {
-        // Report that we are scraping
-        logger.info(`Received valid scrape request! Starting job...`);
         try {
             // Create the scraping service
             const usdaScrapeService = new USDAScrapingService();

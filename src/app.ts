@@ -4,6 +4,8 @@ import { DatabaseService } from "./db/database.service";
 import helmet from "helmet";
 import cors from "cors";
 import { logger } from "./utils/winston-logger";
+import { SelfUpdate } from "./modules/update-data/self-update.service";
+import cron from "node-cron";
 
 class App {
     // Stores the express app instance
@@ -13,9 +15,7 @@ class App {
     constructor() {
         this.app = express();
         this.middleware();
-
-        // Connect to DB
-        DatabaseService.connect(process.env.MONGODB_URI!);
+        this.serverStart();
     }
 
     private middleware(): void {
@@ -76,6 +76,43 @@ class App {
         this.app.use("/", (req: Request, res: Response): void => {
             res.json({ message: "Nothing here but us Robots" });
         });
+    }
+
+    private async serverStart(): Promise<void> {
+        await DatabaseService.connect(process.env.MONGODB_URI!);
+        // If the Update Method env is set to SELF, that means we do NOT
+        // listen for a request from Flock Watch Server, we deliver the data to it
+        if(process.env.UPDATE_METHOD === "SELF"){
+            logger.info("Auto Updating Data is Enabled!");
+            
+            // Run the update job as we have just started
+            this.selfUpdate();
+
+            // Create our cron job schedule
+            const cronExpression = process.env.CRON || "10 12 * * 1-5";
+            cron.schedule(cronExpression, this.selfUpdate);
+        }
+    }
+    private async selfUpdate() {
+        logger.info("Checking if an update is needed!");
+        const updater = new SelfUpdate();
+        const flockData = await updater.updateIfOutdated();
+        // If we got an object back that means we ran our scrapers and have data to send
+        if(flockData){
+            const serverURL = process.env.SERVER_UPDATE_URL; //|| "http://localhost:6061/data";
+            logger.info(`Sending new data to server: ${serverURL}`);
+            const res = await fetch(serverURL!, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(flockData)
+            });
+            
+            
+        }else{
+            logger.info("DB is already up to date!")
+        }
     }
 }
 
