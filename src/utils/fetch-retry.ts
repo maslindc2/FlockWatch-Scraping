@@ -1,9 +1,8 @@
-import { timeout } from "cron";
 import { logger } from "./winston-logger";
 import { FlockData } from "../controllers/scraper.controller";
 
 class FetchRetry {
-    private async fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number) {
+    private async fetchWithTimeout(url: string, options: RequestInit, timeoutMs: number):Promise<Response> {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort, timeoutMs);
         try{
@@ -16,7 +15,7 @@ class FetchRetry {
         }
     }
 
-    private async fetchWithRetry(url: string, retries: number, timeoutMs: number, baseDelay: number, authID: string, flockData: FlockData) {
+    private async fetchWithRetry(url: string, retries: number, timeoutMs: number, baseDelay: number, authID: string, flockData: FlockData): Promise<Response> {
         const wait = (ms: number) =>
                 new Promise((resolve) => setTimeout(resolve, ms));
         try {
@@ -55,35 +54,21 @@ class FetchRetry {
             );
         }
     }
-    public async postRetry(fwScrapingURL: string, authID: string, flockData: FlockData) {
+    public async postRetry(URL: string, authID: string, flockData: FlockData):Promise<Response | undefined> {
         try {
-            const res = await this.fetchWithRetry(
-                fwScrapingURL,
+            return await this.fetchWithRetry(
+                URL,
                 3,
                 120000,
                 500,
                 authID,
                 flockData
             );
-
-            if (!res.ok) {
-                logger.error(`Scraping service returned HTTP ${res.status}`);
-                return null;
-            }
-
-            const jsonResponse = await res.json();
-
-            if (!jsonResponse || Object.keys(jsonResponse).length === 0) {
-                logger.error(
-                    `Received empty or invalid JSON from scraping service`
-                );
-                return null;
-            }
-
-            return jsonResponse;
         } catch (error) {
-            logger.error(`Failed to fetch from scraper: ${error}`);
-            return null;
+            logger.error(`Failed to make a post request, resulted in ${error}`);
+            console.error(`Failed to make a post request, resulted in ${error}`);
         }
     }
 }
+
+export {FetchRetry};

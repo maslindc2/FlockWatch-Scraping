@@ -6,6 +6,9 @@ import cors from "cors";
 import { logger } from "./utils/winston-logger";
 import { SelfUpdate } from "./modules/update-data/self-update.service";
 import cron from "node-cron";
+import { FetchRetry } from "./utils/fetch-retry";
+import { DataController } from "./controllers/data.controller";
+import { LastReportDateService } from "./modules/last-report-date/last-report-date.service";
 
 class App {
     // Stores the express app instance
@@ -97,19 +100,33 @@ class App {
         logger.info("Checking if an update is needed!");
         const updater = new SelfUpdate();
         const flockData = await updater.updateIfOutdated();
+
         // If we got an object back that means we ran our scrapers and have data to send
         if(flockData){
-            const serverURL = process.env.SERVER_UPDATE_URL; //|| "http://localhost:6061/data";
-            logger.info(`Sending new data to server: ${serverURL}`);
-            const res = await fetch(serverURL!, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(flockData)
-            });
-            
-            
+            // Create a last report date service
+            const lastReportDateService = new LastReportDateService();
+            // Get the auth ID Object from the DB
+            const authIDObj = await lastReportDateService.getAuthID();
+            // Get the authID string
+            const authID = authIDObj?.auth_id ?? null;
+            // If we have an authID then we are ready to run the job
+            if(authID){
+                // Get the server URL we are sending flock data to
+                const serverURL = process.env.SERVER_UPDATE_URL!; //|| "http://localhost:6061/data";
+                // Get the fetchWithRetry object
+                const fetchRetryOBJ = new FetchRetry();
+                // Make a post request using retry
+                const res = await fetchRetryOBJ.postRetry(serverURL, authID, flockData);
+                // If the post was successful then update last scraped date and change auth ID
+                if(res?.ok){
+                    await lastReportDateService.updateLastReportDate(true);
+                }else{
+                    // If we failed during the post request to the server, change the auth ID
+                    await lastReportDateService.updateLastReportDate(false);
+                }
+            }else{
+                logger.info("Auth ID does not exist!");
+            }
         }else{
             logger.info("DB is already up to date!")
         }
