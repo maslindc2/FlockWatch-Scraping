@@ -112,7 +112,7 @@ class App {
             // If we have an authID then we are ready to run the job
             if(authID){
                 // Get the server URL we are sending flock data to
-                const serverURL = process.env.SERVER_UPDATE_URL!; //|| "http://localhost:6061/data";
+                const serverURL = process.env.SERVER_UPDATE_URL! || "http://localhost:8080/data/data-update";
                 // Get the fetchWithRetry object
                 const fetchRetryOBJ = new FetchRetry();
                 // Make a post request using retry
