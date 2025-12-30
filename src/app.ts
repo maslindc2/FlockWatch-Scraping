@@ -6,9 +6,8 @@ import cors from "cors";
 import { logger } from "./utils/winston-logger";
 import { SelfUpdate } from "./modules/update-data/self-update.service";
 import cron from "node-cron";
-import { FetchRetry } from "./utils/fetch-retry";
-import { DataController } from "./controllers/data.controller";
 import { LastReportDateService } from "./modules/last-report-date/last-report-date.service";
+import { FetchRetryAuthID } from "./modules/fetch-retry/fetch-retry-authID";
 
 class App {
     // Stores the express app instance
@@ -73,8 +72,15 @@ class App {
             );
             next();
         });
-        // Anything handle the scraper is on /scraper
-        this.app.use("/scraper", scraperRoutes);
+        
+        // If we are not Auto Updating then enable the scraping router as we will be receiving requests from the server
+        // Server will be responsible for knowing when to update
+        if(!process.env.AUTO_UPDATE || process.env.AUTO_UPDATE === "false"){
+            logger.info("Auto Update is Disabled! Server will request new info from us");
+            logger.info("The route /scraper/process-data is active");
+            this.app.use("/scraper", scraperRoutes);
+        }
+        
         // Set the root url to return the default message
         this.app.use("/", (req: Request, res: Response): void => {
             res.json({ message: "Nothing here but us Robots" });
@@ -85,8 +91,9 @@ class App {
         await DatabaseService.connect(process.env.MONGODB_URI!);
         // If the Update Method env is set to SELF, that means we do NOT
         // listen for a request from Flock Watch Server, we deliver the data to it
-        if(process.env.UPDATE_METHOD === "SELF"){
-            logger.info("Auto Updating Data is Enabled!");
+        if(process.env.AUTO_UPDATE && process.env.AUTO_UPDATE === "true"){
+            logger.info("Auto Update is Enabled! We will send new information to the Server!");
+            logger.info("The route /scraper/process-data is DISABLED");
             
             // Run the update job as we have just started
             this.selfUpdate();
@@ -114,9 +121,9 @@ class App {
                 // Get the server URL we are sending flock data to
                 const serverURL = process.env.SERVER_UPDATE_URL! || "http://localhost:8080/data/data-update";
                 // Get the fetchWithRetry object
-                const fetchRetryOBJ = new FetchRetry();
+                const fetchRetry = new FetchRetryAuthID(authID);
                 // Make a post request using retry
-                const res = await fetchRetryOBJ.postRetry(serverURL, authID, flockData);
+                const res = await fetchRetry.postRetry(serverURL, flockData, 5, 30 * 1000, 500);
                 // If the post was successful then update last scraped date and change auth ID
                 if(res?.ok){
                     await lastReportDateService.updateLastReportDate(true);

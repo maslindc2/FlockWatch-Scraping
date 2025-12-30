@@ -6,6 +6,7 @@ import { ScraperController } from "../controllers/scraper.controller";
 
 const router = Router();
 
+
 // This is our process data route where we receive a request for getting the latest Avian Influenza data
 router.post("/process-data", async (req: Request, res: Response) => {
     // Store the authentication ID we got from Flock Watch Server
