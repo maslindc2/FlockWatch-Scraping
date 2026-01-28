@@ -42,7 +42,7 @@ describe("System Testing FW Scraper", () => {
 
             try {
                 const res = await request(new App().app)
-                    .post("/scraper/process-data")
+                    .post("/scraper/get-data")
                     .set("Authorization", `Bearer ${authID}`)
                     .expect(200);
                 scraperResponse = res.body;

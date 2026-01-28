@@ -10,8 +10,8 @@ class SelfUpdate {
             return;
         }
         logger.info("DB is outdated gathering latest data!");
-        const controller = new ScraperController();
-        const flockData = await controller.runScrapeJob();
+        const scrapeController = new ScraperController(true, "data-tb-test-id", process.env.SCRAPE_URL!);
+        const flockData = await scrapeController.runScrapeJob();
         return flockData;
     }
     private isOutdated(lastDate: string): boolean {

@@ -1,7 +1,13 @@
 import { logger } from "../../utils/winston-logger";
-import { FlockData } from "../../controllers/scraper.controller";
 
 class FetchRetry {
+    /**
+     * 
+     * @param URL 
+     * @param options 
+     * @param timeoutMs 
+     * @returns 
+     */
     private async fetchWithTimeout(URL: string, options: RequestInit, timeoutMs: number):Promise<Response> {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort, timeoutMs);
@@ -61,12 +67,48 @@ class FetchRetry {
         };
     }
 
+    /**
+     * 
+     * @param URL 
+     * @param data 
+     * @param retries 
+     * @param timeoutMs 
+     * @param baseDelay 
+     * @returns 
+     */
     public async postRetry(URL: string, data: any, retries:number, timeoutMs: number, baseDelay: number):Promise<Response | undefined> {
         try {
             const config = {
                 method: "POST",
                 headers: this.buildHeaders(),
                 body: JSON.stringify(data)
+            }
+
+            return await this.fetchWithRetry(
+                URL,
+                retries,
+                timeoutMs,
+                baseDelay,
+                config
+            );
+        } catch (error) {
+            logger.error(`Failed to make a post request, resulted in ${error}`);
+            console.error(`Failed to make a post request, resulted in ${error}`);
+        }
+    }
+    /**
+     * 
+     * @param URL 
+     * @param retries 
+     * @param timeoutMs 
+     * @param baseDelay 
+     * @returns 
+     */
+    public async getRetry(URL: string, retries:number, timeoutMs: number, baseDelay: number):Promise<Response | undefined> {
+        try {
+            const config = {
+                method: "GET",
+                headers: this.buildHeaders(),
             }
 
             return await this.fetchWithRetry(

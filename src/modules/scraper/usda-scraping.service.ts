@@ -1,12 +1,8 @@
 import { Browser, Page, chromium, selectors } from "playwright";
 import axios from "axios";
 import { logger } from "../../utils/winston-logger";
+import { ScraperContext } from "./scraper.context";
 
-type USDAScrapingConfig = {
-    headless: boolean;
-    testIdAttribute: string;
-    scrapeURL: string;
-};
 
 type Last30DaysCSVs = {
     affectedTotalsCSV: SharedArrayBuffer;
@@ -16,35 +12,14 @@ type Last30DaysCSVs = {
 class USDAScrapingService {
     private browser!: Browser;
     private page!: Page;
+    private scrapeURL!: string;
 
-    /**
-     * This is the browser and page configuration. We can modify these values here directly.
-     * headless: Sets whether or not we running heedlessly or not.
-     * testIdAttribute: We can use the testId to target buttons that Tableau attempts to block from scrapers clicking on them
-     * scrapeURL: This is the URL that goes directly to the Tableau Data Widget.
-     */
-    private readonly config: USDAScrapingConfig = {
-        headless: true,
-        testIdAttribute: "data-tb-test-id",
-        scrapeURL: process.env.SCRAPE_URL!,
-    };
-    /**
-     * This sets up the browser and page instances needed for scraping
-     * @param config This is the configuration from above, adjust the params depending on how the browser needs to be setup
-     * @returns Returns a browser and page instance
-     */
-    private async setupBrowser(
-        config: USDAScrapingConfig
-    ): Promise<{ browser: Browser; page: Page }> {
-        selectors.setTestIdAttribute(config.testIdAttribute);
-        const browser = await chromium.launch({ headless: config.headless });
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        return {
-            page,
-            browser,
-        };
+    constructor(scrapeContext: ScraperContext){
+        this.browser = scrapeContext.getBrowser();
+        this.page = scrapeContext.getPage();
+        this.scrapeURL = scrapeContext.getURLToScrape();
     }
+    
     // Select the flock data we want, for this it's all flocks we want the data for
     private async selectFlockType(): Promise<void> {
         // Using the label to target the drop down menu
@@ -105,14 +80,9 @@ class USDAScrapingService {
      */
     public async getAllTimeTotals(): Promise<SharedArrayBuffer> {
         try {
-            // Setup the browser and page instances
-            const { browser: browserInstance, page } = await this.setupBrowser(
-                this.config
-            );
-            this.browser = browserInstance;
-            this.page = page;
+            
             // Go to the URL we want to scrape
-            await this.page.goto(this.config.scrapeURL);
+            await this.page.goto(this.scrapeURL);
             // Select the flock type we want for our data
             await this.selectFlockType();
             // Select the time period we want
@@ -157,18 +127,9 @@ class USDAScrapingService {
      */
     public async getLast30Days(): Promise<Last30DaysCSVs> {
         try {
-            // Set up the browser instance using the config from above
-            const { browser: browserInstance, page } = await this.setupBrowser(
-                this.config
-            );
-
-            // Store our browser instance
-            this.browser = browserInstance;
-            // Store the page instance
-            this.page = page;
-
+            
             // Go to the URL we want to scrape
-            await this.page.goto(this.config.scrapeURL);
+            await this.page.goto(this.scrapeURL);
 
             // Go straight to download options as it does not matter if we select the flock type or the time period
             // The Affected Totals.csv will always be the last 30 days

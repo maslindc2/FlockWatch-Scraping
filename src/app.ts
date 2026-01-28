@@ -75,9 +75,9 @@ class App {
         
         // If we are not Auto Updating then enable the scraping router as we will be receiving requests from the server
         // Server will be responsible for knowing when to update
-        if(!process.env.AUTO_UPDATE || process.env.AUTO_UPDATE === "false"){
+        if(!process.env.AUTO_UPDATE || process.env.AUTO_UPDATE === "false" || process.env.AUTO_UPDATE === "False" || process.env.AUTO_UPDATE === "FALSE"){
             logger.info("Auto Update is Disabled! Server will request new info from us");
-            logger.info("The route /scraper/process-data is active");
+            logger.info("The route /scraper/get-data is active");
             this.app.use("/scraper", scraperRoutes);
         }
         
@@ -91,9 +91,9 @@ class App {
         await DatabaseService.connect(process.env.MONGODB_URI!);
         // If the Update Method env is set to SELF, that means we do NOT
         // listen for a request from Flock Watch Server, we deliver the data to it
-        if(process.env.AUTO_UPDATE && process.env.AUTO_UPDATE === "true"){
+        if(process.env.AUTO_UPDATE && (process.env.AUTO_UPDATE === "true" || process.env.AUTO_UPDATE === "True" || process.env.AUTO_UPDATE === "TRUE")){
             logger.info("Auto Update is Enabled! We will send new information to the Server!");
-            logger.info("The route /scraper/process-data is DISABLED");
+            logger.info("The route /scraper/get-data is DISABLED");
             
             // Run the update job as we have just started
             this.selfUpdate();
