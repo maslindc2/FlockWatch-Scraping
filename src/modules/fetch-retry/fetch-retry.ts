@@ -10,7 +10,7 @@ class FetchRetry {
      */
     private async fetchWithTimeout(URL: string, options: RequestInit, timeoutMs: number):Promise<Response> {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort, timeoutMs);
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
         try{
             return await fetch(URL, {
                 ...options,
@@ -61,10 +61,11 @@ class FetchRetry {
             );
         }
     }
-    protected buildHeaders(): Record<string, string> {
-        return {
-            "Content-Type": "application/json"
-        };
+    protected buildHeaders(): Headers {
+        const headers = new Headers();
+        headers.set("Content-Type", "application/json");
+        headers.set("Accept", "application/json");
+        return headers;
     }
 
     /**

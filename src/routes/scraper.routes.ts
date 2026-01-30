@@ -26,7 +26,7 @@ router.get("/get-data", async (req: Request, res: Response) => {
         logger.info(`Received valid scrape request! Starting job...`);
         // Create the scraper controller instance
         const scrapeController = new ScraperController(true, "data-tb-test-id", process.env.SCRAPE_URL!);    
-        await scrapeController.initContext();
+        
         
         // Listen for our client disconnecting, if that occurs kill the scrape job
         req.on("close", () => {

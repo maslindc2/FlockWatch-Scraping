@@ -20,7 +20,7 @@ class ScraperController {
         this.closed = false;
     }
     
-    public async initContext() {
+    private async initContext() {
         await this.scrapeContext.setupBrowser();
     }
 
@@ -32,7 +32,10 @@ class ScraperController {
 
     public async runScrapeJob(): Promise<FlockData> {
         try {
-            
+            if(!this.scrapeContext.getBrowser() && !this.scrapeContext.getBrowser()){
+                logger.info("No context has been made yet!");
+                await this.initContext();
+            }
             // Create the scraping service
             const usdaScrapeService = new USDAScrapingService(this.scrapeContext);
             // Get the All Time US Data for each state
@@ -52,6 +55,8 @@ class ScraperController {
                 await dataProcessor.processLast30DayTotalsCSVs(
                     last30DayTotalsCSVs
                 );
+            
+            await this.stopScrapeJob();
 
             // Return the data to the client
             return {

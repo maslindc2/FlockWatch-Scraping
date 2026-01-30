@@ -1,14 +1,15 @@
 import { FetchRetry } from "./fetch-retry";
 
 class FetchRetryAuthID extends FetchRetry {
-    constructor(private readonly authID: string){
+    constructor(private readonly authID: string) {
         super();
     }
-    protected override buildHeaders(): Record<string, string> {
-        return {
-            ...super.buildHeaders,
-            Authorization: `Bearer ${this.authID}`
-        }
+
+    protected override buildHeaders(): Headers {
+        const headers = super.buildHeaders();
+        headers.set("Authorization", `Bearer ${this.authID}`);
+        return headers;
     }
 }
-export {FetchRetryAuthID}
+
+export { FetchRetryAuthID };

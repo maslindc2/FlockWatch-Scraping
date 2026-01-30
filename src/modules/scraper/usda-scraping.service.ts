@@ -107,18 +107,17 @@ class USDAScrapingService {
             // Return the data
             return csvData;
         } catch (error) {
+            if (this.browser) {
+                logger.info("Closing browser instance");
+                await this.closeBrowser();
+            }
             logger.error(
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
             throw new Error(
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
-        } finally {
-            if (this.browser) {
-                logger.info("Closing browser instance");
-                await this.closeBrowser();
-            }
-        }
+        } 
     }
     /**
      * This function gathers the CSV files for calculating the infections over the last 30 days.
@@ -176,17 +175,16 @@ class USDAScrapingService {
                 confirmedFlocksTotalCSV: confirmedFlocksTotalCSV,
             };
         } catch (error) {
+            if (this.browser) {
+                logger.info("Closing browser instance");
+                await this.closeBrowser();
+            }
             logger.error(
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
             throw new Error(
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
-        } finally {
-            if (this.browser) {
-                logger.info("Closing browser instance");
-                await this.closeBrowser();
-            }
         }
     }
 }

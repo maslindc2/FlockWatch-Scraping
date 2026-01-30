@@ -34,7 +34,7 @@ class App {
             this.app.use(
                 cors({
                     origin: "*",
-                    methods: ["POST"],
+                    methods: ["GET", "POST"],
                     allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
@@ -124,10 +124,14 @@ class App {
                 const fetchRetry = new FetchRetryAuthID(authID);
                 // Make a post request using retry
                 const res = await fetchRetry.postRetry(serverURL, flockData, 5, 30 * 1000, 500);
+                
+
                 // If the post was successful then update last scraped date and change auth ID
                 if(res?.ok){
+                    logger.info("Data sent successfully to server!");
                     await lastReportDateService.updateLastReportDate(true);
                 }else{
+                    logger.info("Failed to send data to server!");
                     // If we failed during the post request to the server, change the auth ID
                     await lastReportDateService.updateLastReportDate(false);
                 }
