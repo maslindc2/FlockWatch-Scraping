@@ -185,4 +185,5 @@ class USDAScrapingService {
         }
     }
 }
-export { USDAScrapingService, Last30DaysCSVs };
+export { USDAScrapingService };
+export type { Last30DaysCSVs };

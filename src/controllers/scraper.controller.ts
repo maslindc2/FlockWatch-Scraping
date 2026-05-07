@@ -85,4 +85,5 @@ class ScraperController {
         }
     }
 }
-export { ScraperController, FlockData };
+export { ScraperController };
+export type { FlockData };

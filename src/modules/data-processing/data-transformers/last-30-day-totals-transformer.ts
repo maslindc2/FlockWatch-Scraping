@@ -87,7 +87,7 @@ class Last30DaysTransformer {
         } else if (trimmed.endsWith("K")) {
             return parseFloat(trimmed.replace("K", "")) * 1_000;
         } else {
-            return parseFloat(trimmed.replace(/,/g, "")) || 0;
+            return parseFloat(trimmed.replace(/,/g, "")); // NaN propagates correctly to isNaN() guards
         }
     }
 }
