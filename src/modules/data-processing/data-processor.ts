@@ -51,7 +51,7 @@ class DataProcessor {
                 "Last Reported Detection Text",
                 "Total Flocks",
                 "State Boundary",
-                "State Label",
+                "State Label Point",
                 "Latitude (generated)",
                 "Longitude (generated)",
             ];
@@ -94,9 +94,9 @@ class DataProcessor {
 
         const affectedTotalsHeaders: string[] = [
             "1",
-            "Commercial Flocks (last 30 days)",
-            "Backyard Flocks (last 30 days)",
-            "Birds Affected (last 30 days)",
+            "Commercial Flocks",
+            "Backyard Flocks",
+            "Birds Affected",
         ];
 
         const affectedTotalsParseConfig: ParseCSVConfig = {

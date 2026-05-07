@@ -2,42 +2,57 @@ import { DataProcessor } from "../modules/data-processing/data-processor";
 import { FlockCasesByState } from "../modules/data-processing/flock-cases-by-state.interface";
 import { Last30Days } from "../modules/data-processing/last-30-days.interface";
 import { ScraperContext } from "../modules/scraper/scraper.context";
-import { Last30DaysCSVs, USDAScrapingService } from "../modules/scraper/usda-scraping.service";
+import {
+    Last30DaysCSVs,
+    USDAScrapingService,
+} from "../modules/scraper/usda-scraping.service";
 import { logger } from "../utils/winston-logger";
 
 type FlockData = {
-    flock_cases_by_state: FlockCasesByState[]
-    period_summaries: Last30Days[]
-}
+    flock_cases_by_state: FlockCasesByState[];
+    period_summaries: Last30Days[];
+};
 
 class ScraperController {
-
     private scrapeContext!: ScraperContext;
     private closed!: boolean;
 
-    constructor(isHeadless:boolean, testIdAttribute: string, urlToScrape: string) {
-        this.scrapeContext = new ScraperContext(isHeadless, testIdAttribute, urlToScrape);
+    constructor(
+        isHeadless: boolean,
+        testIdAttribute: string,
+        urlToScrape: string
+    ) {
+        this.scrapeContext = new ScraperContext(
+            isHeadless,
+            testIdAttribute,
+            urlToScrape
+        );
         this.closed = false;
     }
-    
+
     private async initContext() {
         await this.scrapeContext.setupBrowser();
     }
 
-    public async stopScrapeJob(): Promise<void>{
-        if(this.closed) return;
+    public async stopScrapeJob(): Promise<void> {
+        if (this.closed) return;
         this.closed = true;
         await this.scrapeContext.close();
     }
 
     public async runScrapeJob(): Promise<FlockData> {
         try {
-            if(!this.scrapeContext.getBrowser() && !this.scrapeContext.getBrowser()){
+            if (
+                !this.scrapeContext.getBrowser() &&
+                !this.scrapeContext.getBrowser()
+            ) {
                 logger.info("No context has been made yet!");
                 await this.initContext();
             }
             // Create the scraping service
-            const usdaScrapeService = new USDAScrapingService(this.scrapeContext);
+            const usdaScrapeService = new USDAScrapingService(
+                this.scrapeContext
+            );
             // Get the All Time US Data for each state
             const mapComparisonCSV = await usdaScrapeService.getAllTimeTotals();
             // Get the last 30 day totals for the entire United States
@@ -55,7 +70,7 @@ class ScraperController {
                 await dataProcessor.processLast30DayTotalsCSVs(
                     last30DayTotalsCSVs
                 );
-            
+
             await this.stopScrapeJob();
 
             // Return the data to the client
@@ -64,10 +79,10 @@ class ScraperController {
                 period_summaries: periodSummaries,
             };
         } catch (error) {
-            if(this.closed) return Promise.reject(error);
+            if (this.closed) return Promise.reject(error);
             logger.error("Error processing data: ", error);
             throw new Error(`Error processing data: ${error}`);
         }
     }
 }
-export{ScraperController, FlockData}
+export { ScraperController, FlockData };

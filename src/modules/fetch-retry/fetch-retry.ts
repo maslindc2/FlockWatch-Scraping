@@ -2,16 +2,20 @@ import { logger } from "../../utils/winston-logger";
 
 class FetchRetry {
     /**
-     * 
-     * @param URL 
-     * @param options 
-     * @param timeoutMs 
-     * @returns 
+     *
+     * @param URL
+     * @param options
+     * @param timeoutMs
+     * @returns
      */
-    private async fetchWithTimeout(URL: string, options: RequestInit, timeoutMs: number):Promise<Response> {
+    private async fetchWithTimeout(
+        URL: string,
+        options: RequestInit,
+        timeoutMs: number
+    ): Promise<Response> {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), timeoutMs);
-        try{
+        try {
             return await fetch(URL, {
                 ...options,
                 signal: controller.signal,
@@ -30,17 +34,19 @@ class FetchRetry {
      * @param flockData Data we are sending in our fetch operation
      * @returns Response Promise
      */
-    private async fetchWithRetry(URL: string, retries: number, timeoutMs: number, baseDelay: number, fetchOptions: RequestInit): Promise<Response> {
+    private async fetchWithRetry(
+        URL: string,
+        retries: number,
+        timeoutMs: number,
+        baseDelay: number,
+        fetchOptions: RequestInit
+    ): Promise<Response> {
         const wait = (ms: number) =>
-                new Promise((resolve) => setTimeout(resolve, ms));
+            new Promise((resolve) => setTimeout(resolve, ms));
         try {
-            return await this.fetchWithTimeout(
-                URL,
-                fetchOptions,
-                timeoutMs
-            );
+            return await this.fetchWithTimeout(URL, fetchOptions, timeoutMs);
         } catch (error: any) {
-            if(retries <= 0) throw error;
+            if (retries <= 0) throw error;
 
             logger.error(
                 `Network error contacting Server, retries left ${retries}: ${error.message}`
@@ -49,7 +55,7 @@ class FetchRetry {
             const attemptNumber = retries;
             const rawDelay = baseDelay * Math.pow(2, attemptNumber);
             const jitter = Math.floor(Math.random() * baseDelay);
-            
+
             await wait(rawDelay + jitter);
 
             return this.fetchWithRetry(
@@ -69,21 +75,27 @@ class FetchRetry {
     }
 
     /**
-     * 
-     * @param URL 
-     * @param data 
-     * @param retries 
-     * @param timeoutMs 
-     * @param baseDelay 
-     * @returns 
+     *
+     * @param URL
+     * @param data
+     * @param retries
+     * @param timeoutMs
+     * @param baseDelay
+     * @returns
      */
-    public async postRetry(URL: string, data: any, retries:number, timeoutMs: number, baseDelay: number):Promise<Response | undefined> {
+    public async postRetry(
+        URL: string,
+        data: any,
+        retries: number,
+        timeoutMs: number,
+        baseDelay: number
+    ): Promise<Response | undefined> {
         try {
             const config = {
                 method: "POST",
                 headers: this.buildHeaders(),
-                body: JSON.stringify(data)
-            }
+                body: JSON.stringify(data),
+            };
 
             return await this.fetchWithRetry(
                 URL,
@@ -94,23 +106,30 @@ class FetchRetry {
             );
         } catch (error) {
             logger.error(`Failed to make a post request, resulted in ${error}`);
-            console.error(`Failed to make a post request, resulted in ${error}`);
+            console.error(
+                `Failed to make a post request, resulted in ${error}`
+            );
         }
     }
     /**
-     * 
-     * @param URL 
-     * @param retries 
-     * @param timeoutMs 
-     * @param baseDelay 
-     * @returns 
+     *
+     * @param URL
+     * @param retries
+     * @param timeoutMs
+     * @param baseDelay
+     * @returns
      */
-    public async getRetry(URL: string, retries:number, timeoutMs: number, baseDelay: number):Promise<Response | undefined> {
+    public async getRetry(
+        URL: string,
+        retries: number,
+        timeoutMs: number,
+        baseDelay: number
+    ): Promise<Response | undefined> {
         try {
             const config = {
                 method: "GET",
                 headers: this.buildHeaders(),
-            }
+            };
 
             return await this.fetchWithRetry(
                 URL,
@@ -121,9 +140,11 @@ class FetchRetry {
             );
         } catch (error) {
             logger.error(`Failed to make a post request, resulted in ${error}`);
-            console.error(`Failed to make a post request, resulted in ${error}`);
+            console.error(
+                `Failed to make a post request, resulted in ${error}`
+            );
         }
     }
 }
 
-export {FetchRetry};
+export { FetchRetry };

@@ -3,7 +3,6 @@ import axios from "axios";
 import { logger } from "../../utils/winston-logger";
 import { ScraperContext } from "./scraper.context";
 
-
 type Last30DaysCSVs = {
     affectedTotalsCSV: SharedArrayBuffer;
     confirmedFlocksTotalCSV: SharedArrayBuffer;
@@ -14,16 +13,16 @@ class USDAScrapingService {
     private page!: Page;
     private scrapeURL!: string;
 
-    constructor(scrapeContext: ScraperContext){
+    constructor(scrapeContext: ScraperContext) {
         this.browser = scrapeContext.getBrowser();
         this.page = scrapeContext.getPage();
         this.scrapeURL = scrapeContext.getURLToScrape();
     }
-    
+
     // Select the flock data we want, for this it's all flocks we want the data for
     private async selectFlockType(): Promise<void> {
         // Using the label to target the drop down menu
-        await this.page.getByLabel("Choose variable Commercial Flocks").click();
+        await this.page.getByLabel("Choose variable Birds Affected").click();
         // Selecting the All Flocks menu item
         await this.page.getByRole("menuitem", { name: "All Flocks" }).click();
     }
@@ -80,7 +79,6 @@ class USDAScrapingService {
      */
     public async getAllTimeTotals(): Promise<SharedArrayBuffer> {
         try {
-            
             // Go to the URL we want to scrape
             await this.page.goto(this.scrapeURL);
             // Select the flock type we want for our data
@@ -117,7 +115,7 @@ class USDAScrapingService {
             throw new Error(
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
-        } 
+        }
     }
     /**
      * This function gathers the CSV files for calculating the infections over the last 30 days.
@@ -126,7 +124,6 @@ class USDAScrapingService {
      */
     public async getLast30Days(): Promise<Last30DaysCSVs> {
         try {
-            
             // Go to the URL we want to scrape
             await this.page.goto(this.scrapeURL);
 

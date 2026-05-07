@@ -19,12 +19,14 @@ class DataController {
     public async getLastScrapedDate(): Promise<string> {
         try {
             const data = await this.lastReportDateService.getLastScrapedDate();
-            if(!data){
+            if (!data) {
                 throw new Error("Last Scraped Date not found!");
             }
             const date = data.last_scraped_date;
-            if(!date){
-                throw new Error("Last Scraped Date document exists but no date field!");
+            if (!date) {
+                throw new Error(
+                    "Last Scraped Date document exists but no date field!"
+                );
             }
             return String(date);
         } catch (error) {
