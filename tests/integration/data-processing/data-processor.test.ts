@@ -165,6 +165,20 @@ describe("DataProcessor", () => {
             });
         });
 
+        describe("empty state name filtering", () => {
+            it("filters out rows where State Name is empty", async () => {
+                const emptyStateRow = { ...IOWA_ROW, stateName: "" };
+                const csv = buildMapComparisonsCSV([
+                    emptyStateRow,
+                    MINNESOTA_ROW,
+                ]);
+                const result = await processor.processMapComparisonsCSV(csv);
+
+                expect(result).toHaveLength(1);
+                expect(result[0].state_abbreviation).toBe("MN");
+            });
+        });
+
         describe("zero birds affected filtering", () => {
             it("filters out rows where Birds Affected is 0", async () => {
                 const zeroRow = { ...IOWA_ROW, birdsAffected: "0" };
@@ -311,6 +325,18 @@ describe("DataProcessor", () => {
     });
 
     // -------------------------------------------------------------------------
+    // processMapComparisonsCSV - error handling
+    // -------------------------------------------------------------------------
+    describe("processMapComparisonsCSV - error handling", () => {
+        it("throws when CSV has mismatched column count", async () => {
+            const csv = encodeUtf16LE("Col1\tCol2\nval1\tval2");
+            await expect(
+                processor.processMapComparisonsCSV(csv)
+            ).rejects.toThrow("Failed to process CSV Data");
+        });
+    });
+
+    // -------------------------------------------------------------------------
     // processExportToCsvCSV
     // -------------------------------------------------------------------------
     describe("processExportToCsvCSV", () => {
@@ -453,6 +479,15 @@ describe("DataProcessor", () => {
                     result.historical_summary.total_birds_affected_all_time
                 ).toBe(0);
                 expect(result.historical_summary.total_sites_all_time).toBe(0);
+            });
+        });
+
+        describe("error handling", () => {
+            it("throws when CSV has mismatched column count", async () => {
+                const csv = encodeUtf16LE("Col1\tCol2\nval1");
+                await expect(
+                    processor.processExportToCsvCSV(csv)
+                ).rejects.toThrow("Failed to process ExportToCsv CSV Data");
             });
         });
     });

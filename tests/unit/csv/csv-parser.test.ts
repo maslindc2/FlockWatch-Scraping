@@ -9,6 +9,25 @@ describe("CSVParser", () => {
             const result = CSVParser.parseCSV("", "\t", 1, true);
             expect(result).toEqual([]);
         });
+
+        it("returns an empty array when fileContent is null", () => {
+            const result = CSVParser.parseCSV(null as any, "\t", 1);
+            expect(result).toEqual([]);
+        });
+
+        it("returns an empty array when fileContent is undefined", () => {
+            const result = CSVParser.parseCSV(undefined as any, "\t", 1);
+            expect(result).toEqual([]);
+        });
+    });
+
+    describe("when columns parameter uses the default value", () => {
+        it("defaults columns to true (use first row as headers)", () => {
+            const content = "state\tcount\nTexas\t500";
+            const result = CSVParser.parseCSV(content, "\t", 1);
+            expect(result).toHaveLength(1);
+            expect(result[0]).toEqual({ state: "Texas", count: "500" });
+        });
     });
 
     // -------------------------------------------------------------------------

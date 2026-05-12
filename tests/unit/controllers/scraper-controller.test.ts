@@ -389,6 +389,17 @@ describe("ScraperController", () => {
                 "Error processing data"
             );
         });
+
+        it("returns a rejected promise when an error occurs after the job was externally stopped", async () => {
+            mockGetAllTimeTotals.mockRejectedValueOnce(
+                new Error("Playwright failed")
+            );
+            await controller.stopScrapeJob();
+
+            await expect(controller.runScrapeJob()).rejects.toThrow(
+                "Playwright failed"
+            );
+        });
     });
 
     // -------------------------------------------------------------------------

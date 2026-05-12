@@ -25,7 +25,7 @@ router.get("/get-data", async (req: Request, res: Response) => {
         logger.info(`Received valid scrape request! Starting job...`);
         // Create the scraper controller instance
         const scrapeController = new ScraperController(
-            false,
+            true,
             "data-tb-test-id",
             process.env.SCRAPE_URL!
         );
