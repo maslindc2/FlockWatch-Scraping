@@ -24,7 +24,7 @@ module.exports = {
     // inside a projects[] entry.
     // ---------------------------------------------------------------------------
     collectCoverage: false, // Keep false here - use --coverage flag or npm scripts to control this
-    coverageDirectory: "testing-reports/coverage",
+    coverageDirectory: "coverage",
     coverageReporters: ["text", "lcov", "html"],
 
     // Instrument every source file under src/ so that files not yet imported

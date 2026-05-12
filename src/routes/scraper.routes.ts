@@ -41,7 +41,7 @@ router.get("/get-data", async (req: Request, res: Response) => {
             if (res.headersSent) logger.info("Sent data to client!");
         } catch (error) {
             logger.error("Error processing data: ", error);
-            res.sendStatus(500).json({ error: "Failed to process data" });
+            res.status(500).json({ error: "Failed to process data" });
         } finally {
             scrapeController.stopScrapeJob();
         }
