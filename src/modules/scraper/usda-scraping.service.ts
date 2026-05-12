@@ -184,6 +184,41 @@ class USDAScrapingService {
             );
         }
     }
+
+    public async getExportToCsvData(): Promise<SharedArrayBuffer> {
+        try {
+            await this.page.goto(this.scrapeURL);
+
+            await this.selectDownloadOptions("ExportToCsv");
+
+            const downloadURL = await this.initiateDownload();
+
+            logger.info("Started logging Network responses");
+
+            const response = await axios.get<SharedArrayBuffer>(downloadURL, {
+                responseType: "arraybuffer",
+            });
+
+            const csvData = response.data;
+
+            logger.info(
+                `Successfully downloaded ExportToCsv CSV with Axios (${csvData.byteLength} bytes)`
+            );
+
+            return csvData;
+        } catch (error) {
+            if (this.browser) {
+                logger.info("Closing browser instance");
+                await this.closeBrowser();
+            }
+            logger.error(
+                `Failed to scrape ExportToCsv data: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
+            throw new Error(
+                `Failed to scrape ExportToCsv data: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
+        }
+    }
 }
 export { USDAScrapingService };
 export type { Last30DaysCSVs };
