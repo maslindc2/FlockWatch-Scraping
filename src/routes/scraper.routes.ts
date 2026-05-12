@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import rateLimit from "express-rate-limit";
 import { DataController } from "../controllers/data.controller";
 import { logger } from "../utils/winston-logger";
 
@@ -6,8 +7,17 @@ import { ScraperController } from "../controllers/scraper.controller";
 
 const router = Router();
 
+const scrapeLimiter = rateLimit({
+    windowMs: 30 * 1000,
+    max: 1,
+    message: { error: "Too many requests. Please wait before scraping again." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: () => process.env.NODE_ENV === "test",
+});
+
 // This is our fetch data route where we receive a GET request for getting the latest Avian Influenza data
-router.get("/get-data", async (req: Request, res: Response) => {
+router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
     // Store the authentication ID we got from Flock Watch Server
     const authHeader = req.headers.authorization;
     const receivedAuthID = authHeader?.startsWith("Bearer ")
@@ -47,7 +57,7 @@ router.get("/get-data", async (req: Request, res: Response) => {
         }
     } else {
         logger.error(
-            `Invalid Auth ID from IP ${req.ip}, who sent the auth ID ${receivedAuthID}!`
+            `Invalid Auth ID from IP ${req.ip}!`
         );
         res.sendStatus(403);
     }

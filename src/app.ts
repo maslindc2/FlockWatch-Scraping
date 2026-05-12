@@ -95,6 +95,17 @@ class App {
     }
 
     private async serverStart(): Promise<void> {
+        if (
+            process.env.NODE_ENV !== "development" &&
+            process.env.NODE_ENV !== "test"
+        ) {
+            const updateUrl = process.env.SERVER_UPDATE_URL;
+            if (updateUrl && !updateUrl.startsWith("https://")) {
+                throw new Error(
+                    `SERVER_UPDATE_URL must use HTTPS in production. Got: ${updateUrl}`
+                );
+            }
+        }
         await DatabaseService.connect(process.env.MONGODB_URI!);
         // If the Update Method env is set to SELF, that means we do NOT
         // listen for a request from Flock Watch Server, we deliver the data to it
