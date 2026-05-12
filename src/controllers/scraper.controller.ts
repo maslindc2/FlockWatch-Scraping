@@ -66,6 +66,11 @@ class ScraperController {
             // Get the last 30 day totals for the entire United States
             const last30DayTotalsCSVs: Last30DaysCSVs =
                 await usdaScrapeService.getLast30Days();
+
+            // Get the ExportToCsv site-level data
+            const exportToCsvData =
+                await usdaScrapeService.getExportToCsvData();
+            
             // Create a data processor object
             const dataProcessor = new DataProcessor();
 
@@ -79,9 +84,7 @@ class ScraperController {
                     last30DayTotalsCSVs
                 );
 
-            // Get the ExportToCsv site-level data
-            const exportToCsvData =
-                await usdaScrapeService.getExportToCsvData();
+            
 
             // Process the ExportToCsv CSV
             const { site_details, historical_summary, status_summary } =

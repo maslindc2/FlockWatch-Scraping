@@ -189,7 +189,14 @@ class USDAScrapingService {
         try {
             await this.page.goto(this.scrapeURL);
 
-            await this.selectDownloadOptions("ExportToCsv");
+            // This is where we normally would select the options for the data we want, however for the ExportToCsv the option is already selected for us.
+            // So we have to click the Download button and the CSV option to get the download URL, but we don't have to select any options beforehand
+            await this.page
+                .locator('[role="button"]:has-text("Download Data")')
+                .click();
+            await this.page
+                .getByTestId("crosstab-options-dialog-radio-csv-Label")
+                .click();
 
             const downloadURL = await this.initiateDownload();
 
