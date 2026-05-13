@@ -77,6 +77,21 @@ describe("Last30DaysTransformer", () => {
     });
 
     // -------------------------------------------------------------------------
+    // parseNumber - empty / falsy value handling
+    // -------------------------------------------------------------------------
+    describe("parseNumber - empty value", () => {
+        it("returns 0 for an empty string value", () => {
+            const result = (Last30DaysTransformer as any).parseNumber("");
+            expect(result).toBe(0);
+        });
+
+        it("returns 0 for null value", () => {
+            const result = (Last30DaysTransformer as any).parseNumber(null);
+            expect(result).toBe(0);
+        });
+    });
+
+    // -------------------------------------------------------------------------
     // parseNumber - K / M suffix handling (tested via transformData)
     // -------------------------------------------------------------------------
     describe("parseNumber - suffix parsing", () => {

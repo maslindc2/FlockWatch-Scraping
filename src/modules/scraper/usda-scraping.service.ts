@@ -184,6 +184,48 @@ class USDAScrapingService {
             );
         }
     }
+
+    public async getExportToCsvData(): Promise<SharedArrayBuffer> {
+        try {
+            await this.page.goto(this.scrapeURL);
+
+            // This is where we normally would select the options for the data we want, however for the ExportToCsv the option is already selected for us.
+            // So we have to click the Download button and the CSV option to get the download URL, but we don't have to select any options beforehand
+            await this.page
+                .locator('[role="button"]:has-text("Download Data")')
+                .click();
+            await this.page
+                .getByTestId("crosstab-options-dialog-radio-csv-Label")
+                .click();
+
+            const downloadURL = await this.initiateDownload();
+
+            logger.info("Started logging Network responses");
+
+            const response = await axios.get<SharedArrayBuffer>(downloadURL, {
+                responseType: "arraybuffer",
+            });
+
+            const csvData = response.data;
+
+            logger.info(
+                `Successfully downloaded ExportToCsv CSV with Axios (${csvData.byteLength} bytes)`
+            );
+
+            return csvData;
+        } catch (error) {
+            if (this.browser) {
+                logger.info("Closing browser instance");
+                await this.closeBrowser();
+            }
+            logger.error(
+                `Failed to scrape ExportToCsv data: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
+            throw new Error(
+                `Failed to scrape ExportToCsv data: ${error instanceof Error ? error.message : "Unknown error"}`
+            );
+        }
+    }
 }
 export { USDAScrapingService };
 export type { Last30DaysCSVs };

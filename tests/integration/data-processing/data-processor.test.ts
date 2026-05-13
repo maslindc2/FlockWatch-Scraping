@@ -165,6 +165,20 @@ describe("DataProcessor", () => {
             });
         });
 
+        describe("empty state name filtering", () => {
+            it("filters out rows where State Name is empty", async () => {
+                const emptyStateRow = { ...IOWA_ROW, stateName: "" };
+                const csv = buildMapComparisonsCSV([
+                    emptyStateRow,
+                    MINNESOTA_ROW,
+                ]);
+                const result = await processor.processMapComparisonsCSV(csv);
+
+                expect(result).toHaveLength(1);
+                expect(result[0].state_abbreviation).toBe("MN");
+            });
+        });
+
         describe("zero birds affected filtering", () => {
             it("filters out rows where Birds Affected is 0", async () => {
                 const zeroRow = { ...IOWA_ROW, birdsAffected: "0" };
@@ -306,6 +320,174 @@ describe("DataProcessor", () => {
                 const result = await processor.processLast30DayTotalsCSVs(csvs);
 
                 expect(result[0].total_birds_affected).toBe(2_000_000);
+            });
+        });
+    });
+
+    // -------------------------------------------------------------------------
+    // processMapComparisonsCSV - error handling
+    // -------------------------------------------------------------------------
+    describe("processMapComparisonsCSV - error handling", () => {
+        it("throws when CSV has mismatched column count", async () => {
+            const csv = encodeUtf16LE("Col1\tCol2\nval1\tval2");
+            await expect(
+                processor.processMapComparisonsCSV(csv)
+            ).rejects.toThrow("Failed to process CSV Data");
+        });
+    });
+
+    // -------------------------------------------------------------------------
+    // processExportToCsvCSV
+    // -------------------------------------------------------------------------
+    describe("processExportToCsvCSV", () => {
+        function buildExportToCsvCSV(
+            rows: Array<Record<string, string>> = []
+        ): ArrayBuffer {
+            const header =
+                "Special ID\tCounty Name\tState\tProduction\tConfirmed Diagnosis\tControl Area Released\tBirds Affected";
+
+            const dataRows = rows
+                .map(
+                    (r) =>
+                        `${r.specialId}\t${r.county}\t${r.state}\t${r.production}\t${r.confirmedDiagnosis}\t${r.controlAreaReleased}\t${r.birdsAffected}`
+                )
+                .join("\n");
+
+            return encodeUtf16LE(`${header}\n${dataRows}`);
+        }
+
+        const ACTIVE_ROW = {
+            specialId: "LaGrange 89",
+            county: "Lagrange",
+            state: "Indiana",
+            production: "Commercial Duck Breeder",
+            confirmedDiagnosis: "08-May-26",
+            controlAreaReleased: "Active",
+            birdsAffected: "4,600",
+        };
+
+        const RELEASED_ROW = {
+            specialId: "Big Stone 03",
+            county: "Big Stone",
+            state: "Minnesota",
+            production: "Commercial Turkey Meat Bird",
+            confirmedDiagnosis: "17-Apr-26",
+            controlAreaReleased: "08-May-26",
+            birdsAffected: "63,000",
+        };
+
+        const NA_ROW = {
+            specialId: "Meade 01",
+            county: "Meade",
+            state: "South Dakota",
+            production: "WOAH Non-Poultry",
+            confirmedDiagnosis: "27-Apr-26",
+            controlAreaReleased: "NA",
+            birdsAffected: "60",
+        };
+
+        describe("valid input", () => {
+            it("returns site_details for a single row with Active status", async () => {
+                const csv = buildExportToCsvCSV([ACTIVE_ROW]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(result.site_details).toHaveLength(1);
+                expect(result.site_details[0].special_id).toBe("LaGrange 89");
+                expect(result.site_details[0].status).toBe("active");
+                expect(result.site_details[0].birds_affected).toBe(4600);
+            });
+
+            it("returns site_details for a row with Released status", async () => {
+                const csv = buildExportToCsvCSV([RELEASED_ROW]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(result.site_details).toHaveLength(1);
+                expect(result.site_details[0].status).toBe("released");
+                expect(
+                    result.site_details[0].control_area_released_date
+                ).toBeInstanceOf(Date);
+                expect(result.site_details[0].birds_affected).toBe(63000);
+            });
+
+            it("returns site_details for a row with NA status", async () => {
+                const csv = buildExportToCsvCSV([NA_ROW]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(result.site_details).toHaveLength(1);
+                expect(result.site_details[0].status).toBe("na");
+                expect(result.site_details[0].birds_affected).toBe(60);
+            });
+
+            it("parses multiple rows correctly", async () => {
+                const csv = buildExportToCsvCSV([
+                    ACTIVE_ROW,
+                    RELEASED_ROW,
+                    NA_ROW,
+                ]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(result.site_details).toHaveLength(3);
+            });
+
+            it("computes historical_summary across multiple rows", async () => {
+                const csv = buildExportToCsvCSV([
+                    ACTIVE_ROW,
+                    RELEASED_ROW,
+                    NA_ROW,
+                ]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(
+                    result.historical_summary.total_birds_affected_all_time
+                ).toBe(67660);
+                expect(result.historical_summary.total_sites_all_time).toBe(3);
+                expect(result.historical_summary.total_active_sites).toBe(1);
+                expect(result.historical_summary.total_released_sites).toBe(1);
+                expect(result.historical_summary.total_na_sites).toBe(1);
+                expect(result.historical_summary.total_birds_active).toBe(4600);
+            });
+
+            it("computes status_summary", async () => {
+                const csv = buildExportToCsvCSV([ACTIVE_ROW]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(
+                    result.status_summary.sites_confirmed_last_30_days
+                ).toBeGreaterThanOrEqual(0);
+                expect(
+                    result.status_summary.sites_released_last_30_days
+                ).toBeGreaterThanOrEqual(0);
+                expect(
+                    result.status_summary.birds_affected_last_30_days
+                ).toBeGreaterThanOrEqual(0);
+            });
+        });
+
+        describe("empty input", () => {
+            it("returns empty site_details for no data rows", async () => {
+                const csv = buildExportToCsvCSV([]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(result.site_details).toHaveLength(0);
+            });
+
+            it("returns zeroed historical_summary for no data rows", async () => {
+                const csv = buildExportToCsvCSV([]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(
+                    result.historical_summary.total_birds_affected_all_time
+                ).toBe(0);
+                expect(result.historical_summary.total_sites_all_time).toBe(0);
+            });
+        });
+
+        describe("error handling", () => {
+            it("throws when CSV has mismatched column count", async () => {
+                const csv = encodeUtf16LE("Col1\tCol2\nval1");
+                await expect(
+                    processor.processExportToCsvCSV(csv)
+                ).rejects.toThrow("Failed to process ExportToCsv CSV Data");
             });
         });
     });

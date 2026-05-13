@@ -1,6 +1,11 @@
 import { DataProcessor } from "../modules/data-processing/data-processor";
 import { FlockCasesByState } from "../modules/data-processing/flock-cases-by-state.interface";
 import { Last30Days } from "../modules/data-processing/last-30-days.interface";
+import {
+    SiteDetails,
+    HistoricalSummary,
+    StatusTransitionSummary,
+} from "../modules/data-processing/site-details.interface";
 import { ScraperContext } from "../modules/scraper/scraper.context";
 import {
     Last30DaysCSVs,
@@ -11,6 +16,9 @@ import { logger } from "../utils/winston-logger";
 type FlockData = {
     flock_cases_by_state: FlockCasesByState[];
     period_summaries: Last30Days[];
+    site_details: SiteDetails[];
+    historical_summary: HistoricalSummary;
+    status_summary: StatusTransitionSummary;
 };
 
 class ScraperController {
@@ -58,6 +66,11 @@ class ScraperController {
             // Get the last 30 day totals for the entire United States
             const last30DayTotalsCSVs: Last30DaysCSVs =
                 await usdaScrapeService.getLast30Days();
+
+            // Get the ExportToCsv site-level data
+            const exportToCsvData =
+                await usdaScrapeService.getExportToCsvData();
+            
             // Create a data processor object
             const dataProcessor = new DataProcessor();
 
@@ -71,12 +84,21 @@ class ScraperController {
                     last30DayTotalsCSVs
                 );
 
+            
+
+            // Process the ExportToCsv CSV
+            const { site_details, historical_summary, status_summary } =
+                await dataProcessor.processExportToCsvCSV(exportToCsvData);
+
             await this.stopScrapeJob();
 
             // Return the data to the client
             return {
                 flock_cases_by_state: flockCasesByState,
                 period_summaries: periodSummaries,
+                site_details,
+                historical_summary,
+                status_summary,
             };
         } catch (error) {
             if (this.closed) return Promise.reject(error);

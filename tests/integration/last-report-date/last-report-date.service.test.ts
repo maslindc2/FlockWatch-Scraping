@@ -279,4 +279,20 @@ describe("LastReportDateService", () => {
             expect(firstAuthId).not.toBe(secondAuthId);
         });
     });
+
+    // -------------------------------------------------------------------------
+    // updateLastReportDate - error handling
+    // -------------------------------------------------------------------------
+    describe("updateLastReportDate - error handling", () => {
+        it("throws when the database operation fails", async () => {
+            await mongoose.disconnect();
+
+            await expect(
+                service.updateLastReportDate(true)
+            ).rejects.toThrow("Failed to update the last report date model!");
+
+            // Reconnect for subsequent tests
+            await mongoose.connect((mongoServer as MongoMemoryServer).getUri());
+        });
+    });
 });
