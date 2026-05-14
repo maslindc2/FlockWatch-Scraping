@@ -25,9 +25,9 @@ describe("LastReportDateModel", () => {
     // -------------------------------------------------------------------------
     describe("collection name", () => {
         it("uses the 'last-report-date' collection", () => {
-            expect(
-                LastReportDateModel.getModel.collection.collectionName
-            ).toBe("last-report-date");
+            expect(LastReportDateModel.getModel.collection.collectionName).toBe(
+                "last-report-date"
+            );
         });
     });
 
@@ -72,7 +72,9 @@ describe("LastReportDateModel", () => {
 
             expect(found?.last_scraped_date).toBeInstanceOf(Date);
             expect(
-                (found?.last_scraped_date as unknown as globalThis.Date).toISOString()
+                (
+                    found?.last_scraped_date as unknown as globalThis.Date
+                ).toISOString()
             ).toBe(date.toISOString());
         });
 
@@ -161,7 +163,9 @@ describe("LastReportDateModel", () => {
             const updated = await LastReportDateModel.getModel.findOne();
             expect(updated?.auth_id).toBe("updated-id");
             expect(
-                (updated?.last_scraped_date as unknown as globalThis.Date).toISOString()
+                (
+                    updated?.last_scraped_date as unknown as globalThis.Date
+                ).toISOString()
             ).toBe(newDate.toISOString());
         });
     });

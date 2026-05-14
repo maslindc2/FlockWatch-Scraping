@@ -101,9 +101,7 @@ describe("ScraperController", () => {
         mockGetAllTimeTotals = jest
             .fn()
             .mockResolvedValue(MOCK_MAP_COMPARISON_CSV);
-        mockGetLast30Days = jest
-            .fn()
-            .mockResolvedValue(MOCK_LAST_30_DAYS_CSVS);
+        mockGetLast30Days = jest.fn().mockResolvedValue(MOCK_LAST_30_DAYS_CSVS);
         mockGetExportToCsvData = jest
             .fn()
             .mockResolvedValue(MOCK_EXPORT_TO_CSV_DATA);
@@ -121,13 +119,11 @@ describe("ScraperController", () => {
         mockProcessLast30DayTotalsCSVs = jest
             .fn()
             .mockResolvedValue(MOCK_LAST_30_DAYS);
-        mockProcessExportToCsvCSV = jest
-            .fn()
-            .mockResolvedValue({
-                site_details: MOCK_SITE_DETAILS,
-                historical_summary: MOCK_HISTORICAL_SUMMARY,
-                status_summary: MOCK_STATUS_SUMMARY,
-            });
+        mockProcessExportToCsvCSV = jest.fn().mockResolvedValue({
+            site_details: MOCK_SITE_DETAILS,
+            historical_summary: MOCK_HISTORICAL_SUMMARY,
+            status_summary: MOCK_STATUS_SUMMARY,
+        });
 
         MockedDataProcessor.prototype.processMapComparisonsCSV =
             mockProcessMapComparisonsCSV;
@@ -142,7 +138,11 @@ describe("ScraperController", () => {
     // -------------------------------------------------------------------------
     describe("constructor", () => {
         it("creates a ScraperContext with the provided arguments", () => {
-            new ScraperController(true, "data-tb-test-id", "https://example.com");
+            new ScraperController(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             expect(MockedScraperContext).toHaveBeenCalledWith(
                 true,
@@ -152,7 +152,11 @@ describe("ScraperController", () => {
         });
 
         it("creates a ScraperContext with headless=false when specified", () => {
-            new ScraperController(false, "data-tb-test-id", "https://example.com");
+            new ScraperController(
+                false,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             expect(MockedScraperContext).toHaveBeenCalledWith(
                 false,

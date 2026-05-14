@@ -68,7 +68,9 @@ const MINNESOTA_ROW = {
  * Builds the Affected Totals CSV used for last-30-day processing.
  * Row 1 is the file header (skipped), row 2 is the single data row.
  */
-function buildAffectedTotalsCSV(overrides: Record<string, string> = {}): ArrayBuffer {
+function buildAffectedTotalsCSV(
+    overrides: Record<string, string> = {}
+): ArrayBuffer {
     const defaults = {
         commercialFlocks: "10",
         backyardFlocks: "5",
@@ -222,7 +224,8 @@ describe("DataProcessor", () => {
         describe("valid input", () => {
             it("returns an array with exactly one Last30Days record", async () => {
                 const csvs: Last30DaysCSVs = {
-                    affectedTotalsCSV: buildAffectedTotalsCSV() as SharedArrayBuffer,
+                    affectedTotalsCSV:
+                        buildAffectedTotalsCSV() as SharedArrayBuffer,
                     confirmedFlocksTotalCSV:
                         buildConfirmedFlocksTotalCSV() as SharedArrayBuffer,
                 };
@@ -234,7 +237,8 @@ describe("DataProcessor", () => {
 
             it("sets period_name to last_30_days", async () => {
                 const csvs: Last30DaysCSVs = {
-                    affectedTotalsCSV: buildAffectedTotalsCSV() as SharedArrayBuffer,
+                    affectedTotalsCSV:
+                        buildAffectedTotalsCSV() as SharedArrayBuffer,
                     confirmedFlocksTotalCSV:
                         buildConfirmedFlocksTotalCSV() as SharedArrayBuffer,
                 };
@@ -246,7 +250,8 @@ describe("DataProcessor", () => {
 
             it("parses total_birds_affected stripping commas", async () => {
                 const csvs: Last30DaysCSVs = {
-                    affectedTotalsCSV: buildAffectedTotalsCSV() as SharedArrayBuffer,
+                    affectedTotalsCSV:
+                        buildAffectedTotalsCSV() as SharedArrayBuffer,
                     confirmedFlocksTotalCSV:
                         buildConfirmedFlocksTotalCSV() as SharedArrayBuffer,
                 };
@@ -258,9 +263,11 @@ describe("DataProcessor", () => {
 
             it("parses total_flocks_affected from confirmedFlocksTotalCSV", async () => {
                 const csvs: Last30DaysCSVs = {
-                    affectedTotalsCSV: buildAffectedTotalsCSV() as SharedArrayBuffer,
-                    confirmedFlocksTotalCSV:
-                        buildConfirmedFlocksTotalCSV("20") as SharedArrayBuffer,
+                    affectedTotalsCSV:
+                        buildAffectedTotalsCSV() as SharedArrayBuffer,
+                    confirmedFlocksTotalCSV: buildConfirmedFlocksTotalCSV(
+                        "20"
+                    ) as SharedArrayBuffer,
                 };
 
                 const result = await processor.processLast30DayTotalsCSVs(csvs);
@@ -270,7 +277,8 @@ describe("DataProcessor", () => {
 
             it("parses total_backyard_flocks_affected", async () => {
                 const csvs: Last30DaysCSVs = {
-                    affectedTotalsCSV: buildAffectedTotalsCSV() as SharedArrayBuffer,
+                    affectedTotalsCSV:
+                        buildAffectedTotalsCSV() as SharedArrayBuffer,
                     confirmedFlocksTotalCSV:
                         buildConfirmedFlocksTotalCSV() as SharedArrayBuffer,
                 };
@@ -282,7 +290,8 @@ describe("DataProcessor", () => {
 
             it("parses total_commercial_flocks_affected", async () => {
                 const csvs: Last30DaysCSVs = {
-                    affectedTotalsCSV: buildAffectedTotalsCSV() as SharedArrayBuffer,
+                    affectedTotalsCSV:
+                        buildAffectedTotalsCSV() as SharedArrayBuffer,
                     confirmedFlocksTotalCSV:
                         buildConfirmedFlocksTotalCSV() as SharedArrayBuffer,
                 };

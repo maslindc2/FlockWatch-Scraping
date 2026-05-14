@@ -59,9 +59,7 @@ describe("Scraper Routes", () => {
 
     beforeAll(async () => {
         // Prevent DatabaseService.connect from opening a real connection
-        MockedDatabaseService.connect = jest
-            .fn()
-            .mockResolvedValue(undefined);
+        MockedDatabaseService.connect = jest.fn().mockResolvedValue(undefined);
 
         mockGetServerAuthID = jest.fn();
         mockRunScrapeJob = jest.fn();

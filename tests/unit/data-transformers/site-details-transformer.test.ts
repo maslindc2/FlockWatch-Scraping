@@ -101,8 +101,8 @@ describe("SiteDetailsTransformer", () => {
             expect(
                 result.site_details[0].control_area_released_date
             ).toBeInstanceOf(Date);
-            const date =
-                result.site_details[0].control_area_released_date as Date;
+            const date = result.site_details[0]
+                .control_area_released_date as Date;
             expect(date.getUTCFullYear()).toBe(2026);
             expect(date.getUTCMonth()).toBe(4);
             expect(date.getUTCDate()).toBe(8);
@@ -293,9 +293,9 @@ describe("SiteDetailsTransformer", () => {
                 }),
             ];
             const result = SiteDetailsTransformer.transformData(rows);
-            expect(result.historical_summary.total_birds_affected_all_time).toBe(
-                6000
-            );
+            expect(
+                result.historical_summary.total_birds_affected_all_time
+            ).toBe(6000);
             expect(result.historical_summary.total_sites_all_time).toBe(3);
             expect(result.historical_summary.total_active_sites).toBe(1);
             expect(result.historical_summary.total_released_sites).toBe(1);
@@ -305,9 +305,9 @@ describe("SiteDetailsTransformer", () => {
 
         it("returns zeros for an empty input", () => {
             const result = SiteDetailsTransformer.transformData([]);
-            expect(result.historical_summary.total_birds_affected_all_time).toBe(
-                0
-            );
+            expect(
+                result.historical_summary.total_birds_affected_all_time
+            ).toBe(0);
             expect(result.historical_summary.total_sites_all_time).toBe(0);
             expect(result.historical_summary.total_active_sites).toBe(0);
             expect(result.historical_summary.total_released_sites).toBe(0);
@@ -327,8 +327,18 @@ describe("SiteDetailsTransformer", () => {
                 d.setDate(d.getDate() - n);
                 const day = String(d.getDate()).padStart(2, "0");
                 const months = [
-                    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
                 ];
                 const month = months[d.getMonth()];
                 const year = String(d.getFullYear()).slice(-2);

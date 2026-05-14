@@ -267,13 +267,15 @@ describe("LastReportDateService", () => {
             });
 
             await service.updateLastReportDate(true);
-            const afterFirst =
-                await LastReportDateModel.getModel.findOne().lean();
+            const afterFirst = await LastReportDateModel.getModel
+                .findOne()
+                .lean();
             const firstAuthId = afterFirst?.auth_id;
 
             await service.updateLastReportDate(true);
-            const afterSecond =
-                await LastReportDateModel.getModel.findOne().lean();
+            const afterSecond = await LastReportDateModel.getModel
+                .findOne()
+                .lean();
             const secondAuthId = afterSecond?.auth_id;
 
             expect(firstAuthId).not.toBe(secondAuthId);
@@ -287,9 +289,9 @@ describe("LastReportDateService", () => {
         it("throws when the database operation fails", async () => {
             await mongoose.disconnect();
 
-            await expect(
-                service.updateLastReportDate(true)
-            ).rejects.toThrow("Failed to update the last report date model!");
+            await expect(service.updateLastReportDate(true)).rejects.toThrow(
+                "Failed to update the last report date model!"
+            );
 
             // Reconnect for subsequent tests
             await mongoose.connect((mongoServer as MongoMemoryServer).getUri());

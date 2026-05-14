@@ -56,9 +56,7 @@ router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
             scrapeController.stopScrapeJob();
         }
     } else {
-        logger.error(
-            `Invalid Auth ID from IP ${req.ip}!`
-        );
+        logger.error(`Invalid Auth ID from IP ${req.ip}!`);
         res.sendStatus(403);
     }
 });

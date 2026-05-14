@@ -70,7 +70,7 @@ class ScraperController {
             // Get the ExportToCsv site-level data
             const exportToCsvData =
                 await usdaScrapeService.getExportToCsvData();
-            
+
             // Create a data processor object
             const dataProcessor = new DataProcessor();
 
@@ -83,8 +83,6 @@ class ScraperController {
                 await dataProcessor.processLast30DayTotalsCSVs(
                     last30DayTotalsCSVs
                 );
-
-            
 
             // Process the ExportToCsv CSV
             const { site_details, historical_summary, status_summary } =

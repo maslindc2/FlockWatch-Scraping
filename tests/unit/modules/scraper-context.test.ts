@@ -19,7 +19,8 @@ jest.mock("playwright", () => ({
         launch: (...args: unknown[]) => mockChromiumLaunch(...args),
     },
     selectors: {
-        setTestIdAttribute: (...args: unknown[]) => mockSetTestIdAttribute(...args),
+        setTestIdAttribute: (...args: unknown[]) =>
+            mockSetTestIdAttribute(...args),
     },
     Browser: jest.fn(),
     Page: jest.fn(),
@@ -43,20 +44,32 @@ describe("ScraperContext", () => {
     // -------------------------------------------------------------------------
     describe("constructor and getters", () => {
         it("getURLToScrape returns the URL passed to the constructor", () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             expect(ctx.getURLToScrape()).toBe("https://example.com");
         });
 
         it("getBrowser returns undefined before setupBrowser is called", () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             // browser is declared with ! but never assigned until setupBrowser runs
             expect(ctx.getBrowser()).toBeUndefined();
         });
 
         it("getPage returns undefined before setupBrowser is called", () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             expect(ctx.getPage()).toBeUndefined();
         });
@@ -67,15 +80,25 @@ describe("ScraperContext", () => {
     // -------------------------------------------------------------------------
     describe("setupBrowser", () => {
         it("calls selectors.setTestIdAttribute with the testIdAttribute", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
-            expect(mockSetTestIdAttribute).toHaveBeenCalledWith("data-tb-test-id");
+            expect(mockSetTestIdAttribute).toHaveBeenCalledWith(
+                "data-tb-test-id"
+            );
         });
 
         it("launches chromium with headless=true when specified", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
@@ -83,15 +106,25 @@ describe("ScraperContext", () => {
         });
 
         it("launches chromium with headless=false when specified", async () => {
-            const ctx = new ScraperContext(false, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                false,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
-            expect(mockChromiumLaunch).toHaveBeenCalledWith({ headless: false });
+            expect(mockChromiumLaunch).toHaveBeenCalledWith({
+                headless: false,
+            });
         });
 
         it("calls browser.newContext() to create a browser context", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
@@ -99,7 +132,11 @@ describe("ScraperContext", () => {
         });
 
         it("calls context.newPage() to create a page", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
@@ -107,7 +144,11 @@ describe("ScraperContext", () => {
         });
 
         it("getBrowser returns the browser instance after setupBrowser", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
@@ -117,7 +158,11 @@ describe("ScraperContext", () => {
         it("getPage returns the page instance after setupBrowser", async () => {
             const mockPage = { isClosed: jest.fn() };
             mockNewPage.mockResolvedValueOnce(mockPage);
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
 
             await ctx.setupBrowser();
 
@@ -130,7 +175,11 @@ describe("ScraperContext", () => {
     // -------------------------------------------------------------------------
     describe("close", () => {
         it("calls browser.close() when the context is open", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
             await ctx.setupBrowser();
 
             await ctx.close();
@@ -139,7 +188,11 @@ describe("ScraperContext", () => {
         });
 
         it("is idempotent — calling close twice only closes the browser once", async () => {
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
             await ctx.setupBrowser();
 
             await ctx.close();
@@ -150,7 +203,11 @@ describe("ScraperContext", () => {
 
         it("does not throw if browser.close() rejects", async () => {
             mockBrowserClose.mockRejectedValueOnce(new Error("already closed"));
-            const ctx = new ScraperContext(true, "data-tb-test-id", "https://example.com");
+            const ctx = new ScraperContext(
+                true,
+                "data-tb-test-id",
+                "https://example.com"
+            );
             await ctx.setupBrowser();
 
             await expect(ctx.close()).resolves.not.toThrow();

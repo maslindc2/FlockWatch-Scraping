@@ -147,9 +147,7 @@ class DataProcessor {
         return [transformedData];
     }
 
-    public async processExportToCsvCSV(
-        exportToCsvData: any
-    ): Promise<{
+    public async processExportToCsvCSV(exportToCsvData: any): Promise<{
         site_details: SiteDetails[];
         historical_summary: HistoricalSummary;
         status_summary: StatusTransitionSummary;
@@ -176,20 +174,15 @@ class DataProcessor {
                 exportToCsvData
             );
 
-            const transformed = SiteDetailsTransformer.transformData(
-                parsedData
-            );
+            const transformed =
+                SiteDetailsTransformer.transformData(parsedData);
 
             logger.info("Finished processing ExportToCsv CSV!");
 
             return transformed;
         } catch (error) {
-            logger.error(
-                `Error processing ExportToCsv CSV Data: ${error}`
-            );
-            throw new Error(
-                `Failed to process ExportToCsv CSV Data: ${error}`
-            );
+            logger.error(`Error processing ExportToCsv CSV Data: ${error}`);
+            throw new Error(`Failed to process ExportToCsv CSV Data: ${error}`);
         }
     }
 }

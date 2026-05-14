@@ -6,9 +6,7 @@ import {
 } from "../site-details.interface";
 
 class SiteDetailsTransformer {
-    public static transformData(
-        parsedData: Record<string, string>[]
-    ): {
+    public static transformData(parsedData: Record<string, string>[]): {
         site_details: SiteDetails[];
         historical_summary: HistoricalSummary;
         status_summary: StatusTransitionSummary;
@@ -45,8 +43,7 @@ class SiteDetailsTransformer {
                     confirmed_diagnosis_str
                 );
 
-                const { status, releasedDate } =
-                    this.parseStatus(status_value);
+                const { status, releasedDate } = this.parseStatus(status_value);
 
                 const birds_affected = Number(
                     birds_affected_str.replace(/,/g, "")
@@ -75,12 +72,14 @@ class SiteDetailsTransformer {
             }
         });
 
-        const historical_summary =
-            this.computeHistoricalSummary(siteDetails);
-        const status_summary =
-            this.computeStatusTransitionSummary(siteDetails);
+        const historical_summary = this.computeHistoricalSummary(siteDetails);
+        const status_summary = this.computeStatusTransitionSummary(siteDetails);
 
-        return { site_details: siteDetails, historical_summary, status_summary };
+        return {
+            site_details: siteDetails,
+            historical_summary,
+            status_summary,
+        };
     }
 
     private static parseDDMonYY(dateStr: string): Date {
@@ -133,9 +132,10 @@ class SiteDetailsTransformer {
         return date;
     }
 
-    private static parseStatus(
-        value: string
-    ): { status: "active" | "released" | "na"; releasedDate?: Date } {
+    private static parseStatus(value: string): {
+        status: "active" | "released" | "na";
+        releasedDate?: Date;
+    } {
         const trimmed = value.trim();
 
         if (trimmed === "Active") {
@@ -150,12 +150,8 @@ class SiteDetailsTransformer {
             const date = this.parseDDMonYY(trimmed);
             return { status: "released", releasedDate: date };
         } catch {
-            logger.error(
-                `Invalid Control Area Released value: ${trimmed}`
-            );
-            throw new Error(
-                `Invalid Control Area Released value: ${trimmed}`
-            );
+            logger.error(`Invalid Control Area Released value: ${trimmed}`);
+            throw new Error(`Invalid Control Area Released value: ${trimmed}`);
         }
     }
 
