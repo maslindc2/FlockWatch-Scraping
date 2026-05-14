@@ -5,7 +5,15 @@ import {
 } from "../../controllers/scraper.controller";
 import { logger } from "../../utils/winston-logger";
 
+/**
+ * Handles automatic self-updating of data. Checks if the stored data is older than 24 hours,
+ * and if so, runs a new scrape job and returns the fresh data for delivery to Flock Watch Server.
+ */
 class SelfUpdate {
+    /**
+     * Checks if the stored data is outdated (older than 24h) and, if so, runs a new scrape.
+     * @returns FlockData if an update was needed and completed, or void if data is current.
+     */
     public async updateIfOutdated(): Promise<FlockData | void> {
         const dataController = new DataController();
         const lastDateUpdated = await dataController.getLastScrapedDate();
@@ -21,6 +29,11 @@ class SelfUpdate {
         const flockData = await scrapeController.runScrapeJob();
         return flockData;
     }
+    /**
+     * Determines whether the given date string is older than 24 hours from now.
+     * @param lastDate - ISO date string of the last update.
+     * @returns True if the date is more than 24 hours in the past.
+     */
     private isOutdated(lastDate: string): boolean {
         const now = new Date();
         const last = new Date(lastDate);

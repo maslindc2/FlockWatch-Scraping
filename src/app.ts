@@ -10,17 +10,25 @@ import { LastReportDateService } from "./modules/last-report-date/last-report-da
 import { FetchRetryAuthID } from "./modules/fetch-retry/fetch-retry-authID";
 import compression from "compression";
 
+/**
+ * The main application class that configures Express middleware, connects to MongoDB,
+ * sets up routes, and manages the self-update cron schedule.
+ */
 class App {
-    // Stores the express app instance
+    /** The Express application instance. */
     public app: Application;
 
-    // Setting up the express app
+    /** Initializes the app by applying middleware and starting the server. */
     constructor() {
         this.app = express();
         this.middleware();
         this.serverStart();
     }
 
+    /**
+     * Configures Express middleware: security headers (helmet), compression,
+     * JSON parsing, CORS policies, permissions policy, and route mounting.
+     */
     private middleware(): void {
         // Security headers
         this.app.use(helmet());
@@ -97,6 +105,10 @@ class App {
         });
     }
 
+    /**
+     * Connects to MongoDB and sets up the self-update cron schedule if AUTO_UPDATE is enabled.
+     * In production, validates that SERVER_UPDATE_URL uses HTTPS.
+     */
     private async serverStart(): Promise<void> {
         if (
             process.env.NODE_ENV !== "development" &&
@@ -131,6 +143,10 @@ class App {
             cron.schedule(cronExpression, this.selfUpdate);
         }
     }
+    /**
+     * Checks if the database is outdated and, if so, runs a scrape and posts the data
+     * to the Flock Watch Server using FetchRetryAuthID with exponential backoff.
+     */
     private async selfUpdate() {
         logger.info("Checking if an update is needed!");
         const updater = new SelfUpdate();

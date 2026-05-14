@@ -138,8 +138,17 @@ dist
 # DB Data
 data/
 
+# TypeDoc generated documentation
+/docs/
+
 # Playwright
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Codenomad files
+/.codenomad/
+
+#Hide vscode settings
+/.vscode/

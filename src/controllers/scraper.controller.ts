@@ -13,6 +13,9 @@ import {
 } from "../modules/scraper/usda-scraping.service";
 import { logger } from "../utils/winston-logger";
 
+/**
+ * Represents the processed data returned from a scrape job.
+ */
 type FlockData = {
     flock_cases_by_state: FlockCasesByState[];
     period_summaries: Last30Days[];
@@ -21,10 +24,21 @@ type FlockData = {
     status_summary: StatusTransitionSummary;
 };
 
+/**
+ * Controller responsible for orchestrating web scraping operations.
+ * Manages the browser lifecycle, runs the USDA scraping service,
+ * and processes scraped CSV data into structured formats.
+ */
 class ScraperController {
     private scrapeContext!: ScraperContext;
     private closed!: boolean;
 
+    /**
+     * Creates the scraping controller with the specified configuration.
+     * @param isHeadless - Whether to run the browser in headless mode.
+     * @param testIdAttribute - Test ID attribute to target buttons Tableau buttons.
+     * @param urlToScrape - URL pointing directly to the USDA Tableau Data Widget.
+     */
     constructor(
         isHeadless: boolean,
         testIdAttribute: string,
@@ -38,16 +52,27 @@ class ScraperController {
         this.closed = false;
     }
 
+    /**
+     * Initializes the browser context by setting up the Playwright browser and page.
+     */
     private async initContext() {
         await this.scrapeContext.setupBrowser();
     }
 
+    /**
+     * Stops the current scrape job and closes the browser context if still open.
+     */
     public async stopScrapeJob(): Promise<void> {
         if (this.closed) return;
         this.closed = true;
         await this.scrapeContext.close();
     }
 
+    /**
+     * Runs the complete scrape job: fetches all-time totals, last-30-day totals,
+     * and export-to-CSV data from the USDA site, then processes each into structured FlockData.
+     * @returns The fully processed flock data including cases by state, period summaries, and site details.
+     */
     public async runScrapeJob(): Promise<FlockData> {
         try {
             if (

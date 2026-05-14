@@ -2,6 +2,7 @@
     "exclude": [
         "./coverage",
         "./dist",
+        "./docs",
         "tests",
         "jest.setup.ts",
         "jest.config.js",
