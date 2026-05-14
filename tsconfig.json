@@ -15,16 +15,15 @@
         "files": true
     },
     "compilerOptions": {
-        "target": "es2016",
+        "target": "es2021",
         "module": "nodenext",
         "rootDir": "./src",
-        "moduleResolution": "node16",
+        "moduleResolution": "nodenext",
         "checkJs": true,
         "outDir": "./dist",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "noImplicitAny": true,
         "skipLibCheck": true,
         "isolatedModules": true
     }

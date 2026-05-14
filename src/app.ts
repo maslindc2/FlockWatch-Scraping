@@ -8,6 +8,7 @@ import { SelfUpdate } from "./modules/update-data/self-update.service";
 import cron from "node-cron";
 import { LastReportDateService } from "./modules/last-report-date/last-report-date.service";
 import { FetchRetryAuthID } from "./modules/fetch-retry/fetch-retry-authID";
+import compression from "compression";
 
 class App {
     // Stores the express app instance
@@ -21,12 +22,14 @@ class App {
     }
 
     private middleware(): void {
+        // Security headers
+        this.app.use(helmet());
+        // Compress all responses (gzip/brotli)
+        this.app.use(compression());
         // Accepting json
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: false }));
-        // Setting up helmet for setting security headers
-        this.app.use(helmet());
-
+        // Set CORS policies depending on what ENV mode we are in
         if (process.env.NODE_ENV === "development") {
             logger.info(
                 "Currently in development mode, CORS allows all origins!"
