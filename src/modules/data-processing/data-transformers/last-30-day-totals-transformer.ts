@@ -28,23 +28,16 @@ class Last30DaysTransformer {
 
             const affectedTotals = affectedTotalsData[0];
 
-            const birdsAffectedStr =
-                affectedTotals["Birds Affected (last 30 days)"];
-            const totalFlocksStr =
-                confirmedFlockTotals["Total Flocks (last 30 days)"];
-            const backyardFlocksStr =
-                affectedTotals["Backyard Flocks (last 30 days)"];
-            const commercialFlocksStr =
-                affectedTotals["Commercial Flocks (last 30 days)"];
+            const birdsAffectedStr = affectedTotals["Birds Affected"];
+            const totalFlocksStr = confirmedFlockTotals["Total Flocks"];
+            const backyardFlocksStr = affectedTotals["Backyard Flocks"];
+            const commercialFlocksStr = affectedTotals["Commercial Flocks"];
 
-            if (!birdsAffectedStr)
-                throw new Error("Missing Birds Affected (last 30 days)");
-            if (!totalFlocksStr)
-                throw new Error("Missing Total Flocks (last 30 days)");
-            if (!backyardFlocksStr)
-                throw new Error("Missing Backyard Flocks (last 30 days)");
+            if (!birdsAffectedStr) throw new Error("Missing Birds Affected");
+            if (!totalFlocksStr) throw new Error("Missing Total Flocks");
+            if (!backyardFlocksStr) throw new Error("Missing Backyard Flocks");
             if (!commercialFlocksStr)
-                throw new Error("Missing Commercial Flocks (last 30 days)");
+                throw new Error("Missing Commercial Flocks");
 
             const period_name = "last_30_days";
             const total_birds_affected = this.parseNumber(birdsAffectedStr);
@@ -94,7 +87,7 @@ class Last30DaysTransformer {
         } else if (trimmed.endsWith("K")) {
             return parseFloat(trimmed.replace("K", "")) * 1_000;
         } else {
-            return parseFloat(trimmed.replace(/,/g, "")) || 0;
+            return parseFloat(trimmed.replace(/,/g, "")); // NaN propagates correctly to isNaN() guards
         }
     }
 }

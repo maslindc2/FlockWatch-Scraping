@@ -1,9 +1,15 @@
 import { CSVParser } from "./csv/csv-parser";
 import { FlockCasesByStateTransformer } from "./data-transformers/flock-cases-by-state-transformer";
 import { Last30DaysTransformer } from "./data-transformers/last-30-day-totals-transformer";
+import { SiteDetailsTransformer } from "./data-transformers/site-details-transformer";
 import { Last30DaysCSVs } from "../scraper/usda-scraping.service";
 import { FlockCasesByState } from "./flock-cases-by-state.interface";
 import { Last30Days } from "./last-30-days.interface";
+import {
+    SiteDetails,
+    HistoricalSummary,
+    StatusTransitionSummary,
+} from "./site-details.interface";
 import { logger } from "../../utils/winston-logger";
 
 type ParseCSVConfig = {
@@ -51,7 +57,7 @@ class DataProcessor {
                 "Last Reported Detection Text",
                 "Total Flocks",
                 "State Boundary",
-                "State Label",
+                "State Label Point",
                 "Latitude (generated)",
                 "Longitude (generated)",
             ];
@@ -94,9 +100,9 @@ class DataProcessor {
 
         const affectedTotalsHeaders: string[] = [
             "1",
-            "Commercial Flocks (last 30 days)",
-            "Backyard Flocks (last 30 days)",
-            "Birds Affected (last 30 days)",
+            "Commercial Flocks",
+            "Backyard Flocks",
+            "Birds Affected",
         ];
 
         const affectedTotalsParseConfig: ParseCSVConfig = {
@@ -139,6 +145,45 @@ class DataProcessor {
         );
 
         return [transformedData];
+    }
+
+    public async processExportToCsvCSV(exportToCsvData: any): Promise<{
+        site_details: SiteDetails[];
+        historical_summary: HistoricalSummary;
+        status_summary: StatusTransitionSummary;
+    }> {
+        try {
+            const customHeaders: string[] = [
+                "Special ID",
+                "County Name",
+                "State",
+                "Production",
+                "Confirmed Diagnosis",
+                "Control Area Released",
+                "Birds Affected",
+            ];
+
+            const parseConfig: ParseCSVConfig = {
+                csvHeaders: customHeaders,
+                delimiter: "\t",
+                startFromRow: 2,
+            };
+
+            const parsedData = await this.parseCSVData(
+                parseConfig,
+                exportToCsvData
+            );
+
+            const transformed =
+                SiteDetailsTransformer.transformData(parsedData);
+
+            logger.info("Finished processing ExportToCsv CSV!");
+
+            return transformed;
+        } catch (error) {
+            logger.error(`Error processing ExportToCsv CSV Data: ${error}`);
+            throw new Error(`Failed to process ExportToCsv CSV Data: ${error}`);
+        }
     }
 }
 export { DataProcessor };

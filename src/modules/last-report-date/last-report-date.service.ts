@@ -1,3 +1,4 @@
+import { logger } from "../../utils/winston-logger";
 import { LastReportDateModel } from "./last-report-date.model";
 
 class LastReportDateService {
@@ -15,6 +16,31 @@ class LastReportDateService {
             .select("-_id -__v -last_scraped_date")
             .lean();
     }
+
+    public async updateLastReportDate(isSuccessfulUpdate: Boolean) {
+        // Model object contains today's timestamp, and the newly created authID
+        let modelObj;
+        if (isSuccessfulUpdate) {
+            modelObj = {
+                last_scraped_date: new Date(),
+                auth_id: crypto.randomUUID(),
+            };
+        } else {
+            modelObj = {
+                auth_id: crypto.randomUUID(),
+            };
+        }
+        try {
+            // Update the last report date entry
+            await LastReportDateModel.getModel.updateOne({}, modelObj);
+        } catch (error) {
+            logger.error(
+                `Failed to update the last report date model! Received isSuccessfulUpdate bool value of ${isSuccessfulUpdate} resulted in: ${error}`
+            );
+            throw new Error("Failed to update the last report date model!");
+        }
+    }
+
     /**
      * On server start this will be executed, if the mongoDB is being created for the first time
      * This will create an entry with the date last scraped, scrape frequency, and auth id.

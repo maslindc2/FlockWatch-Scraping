@@ -4,6 +4,10 @@ import { DatabaseService } from "./db/database.service";
 import helmet from "helmet";
 import cors from "cors";
 import { logger } from "./utils/winston-logger";
+import { SelfUpdate } from "./modules/update-data/self-update.service";
+import cron from "node-cron";
+import { LastReportDateService } from "./modules/last-report-date/last-report-date.service";
+import { FetchRetryAuthID } from "./modules/fetch-retry/fetch-retry-authID";
 
 class App {
     // Stores the express app instance
@@ -13,9 +17,7 @@ class App {
     constructor() {
         this.app = express();
         this.middleware();
-
-        // Connect to DB
-        DatabaseService.connect(process.env.MONGODB_URI!);
+        this.serverStart();
     }
 
     private middleware(): void {
@@ -32,7 +34,7 @@ class App {
             this.app.use(
                 cors({
                     origin: "*",
-                    methods: ["POST"],
+                    methods: ["GET", "POST"],
                     allowedHeaders: ["Authorization", "Content-Type"],
                 })
             );
@@ -70,12 +72,107 @@ class App {
             );
             next();
         });
-        // Anything handle the scraper is on /scraper
-        this.app.use("/scraper", scraperRoutes);
+
+        // If we are not Auto Updating then enable the scraping router as we will be receiving requests from the server
+        // Server will be responsible for knowing when to update
+        if (
+            !process.env.AUTO_UPDATE ||
+            process.env.AUTO_UPDATE === "false" ||
+            process.env.AUTO_UPDATE === "False" ||
+            process.env.AUTO_UPDATE === "FALSE"
+        ) {
+            logger.info(
+                "Auto Update is Disabled! Server will request new info from us"
+            );
+            logger.info("The route /scraper/get-data is active");
+            this.app.use("/scraper", scraperRoutes);
+        }
+
         // Set the root url to return the default message
         this.app.use("/", (req: Request, res: Response): void => {
             res.json({ message: "Nothing here but us Robots" });
         });
+    }
+
+    private async serverStart(): Promise<void> {
+        if (
+            process.env.NODE_ENV !== "development" &&
+            process.env.NODE_ENV !== "test"
+        ) {
+            const updateUrl = process.env.SERVER_UPDATE_URL;
+            if (updateUrl && !updateUrl.startsWith("https://")) {
+                throw new Error(
+                    `SERVER_UPDATE_URL must use HTTPS in production. Got: ${updateUrl}`
+                );
+            }
+        }
+        await DatabaseService.connect(process.env.MONGODB_URI!);
+        // If the Update Method env is set to SELF, that means we do NOT
+        // listen for a request from Flock Watch Server, we deliver the data to it
+        if (
+            process.env.AUTO_UPDATE &&
+            (process.env.AUTO_UPDATE === "true" ||
+                process.env.AUTO_UPDATE === "True" ||
+                process.env.AUTO_UPDATE === "TRUE")
+        ) {
+            logger.info(
+                "Auto Update is Enabled! We will send new information to the Server!"
+            );
+            logger.info("The route /scraper/get-data is DISABLED");
+
+            // Run the update job as we have just started
+            this.selfUpdate();
+
+            // Create our cron job schedule
+            const cronExpression = process.env.CRON || "10 12 * * 1-5";
+            cron.schedule(cronExpression, this.selfUpdate);
+        }
+    }
+    private async selfUpdate() {
+        logger.info("Checking if an update is needed!");
+        const updater = new SelfUpdate();
+        const flockData = await updater.updateIfOutdated();
+
+        // If we got an object back that means we ran our scrapers and have data to send
+        if (flockData) {
+            // Create a last report date service
+            const lastReportDateService = new LastReportDateService();
+            // Get the auth ID Object from the DB
+            const authIDObj = await lastReportDateService.getAuthID();
+            // Get the authID string
+            const authID = authIDObj?.auth_id ?? null;
+            // If we have an authID then we are ready to run the job
+            if (authID) {
+                // Get the server URL we are sending flock data to
+                const serverURL =
+                    process.env.SERVER_UPDATE_URL! ||
+                    "http://localhost:8080/data/data-update";
+                // Get the fetchWithRetry object
+                const fetchRetry = new FetchRetryAuthID(authID);
+                // Make a post request using retry
+                const res = await fetchRetry.postRetry(
+                    serverURL,
+                    flockData,
+                    5,
+                    30 * 1000,
+                    500
+                );
+
+                // If the post was successful then update last scraped date and change auth ID
+                if (res?.ok) {
+                    logger.info("Data sent successfully to server!");
+                    await lastReportDateService.updateLastReportDate(true);
+                } else {
+                    logger.info("Failed to send data to server!");
+                    // If we failed during the post request to the server, change the auth ID
+                    await lastReportDateService.updateLastReportDate(false);
+                }
+            } else {
+                logger.info("Auth ID does not exist!");
+            }
+        } else {
+            logger.info("DB is already up to date!");
+        }
     }
 }
 
