@@ -1,4 +1,4 @@
-import { Browser, Page, chromium, selectors } from "playwright";
+import { Browser, Page } from "playwright";
 import axios from "axios";
 import { logger } from "../../utils/winston-logger";
 import { ScraperContext } from "./scraper.context";
@@ -113,7 +113,8 @@ class USDAScrapingService {
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
             throw new Error(
-                `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
+                `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
             );
         }
     }
@@ -180,7 +181,8 @@ class USDAScrapingService {
                 `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
             throw new Error(
-                `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`
+                `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
             );
         }
     }
@@ -222,7 +224,8 @@ class USDAScrapingService {
                 `Failed to scrape ExportToCsv data: ${error instanceof Error ? error.message : "Unknown error"}`
             );
             throw new Error(
-                `Failed to scrape ExportToCsv data: ${error instanceof Error ? error.message : "Unknown error"}`
+                `Failed to scrape USDA data: ${error instanceof Error ? error.message : "Unknown error"}`,
+                { cause: error }
             );
         }
     }

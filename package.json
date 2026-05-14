@@ -10,7 +10,9 @@
         "nodemon": "nodemon ./src/server.ts",
         "build": "tsc --project tsconfig.json",
         "dev": "npm run build && node ./dist/server.js",
-        "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+        "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
     },
     "repository": {
         "type": "git",

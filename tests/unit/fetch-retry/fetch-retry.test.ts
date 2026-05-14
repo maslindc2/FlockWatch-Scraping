@@ -9,11 +9,6 @@ function buildOkResponse(body = "{}"): Response {
     return new Response(body, { status: 200 });
 }
 
-/** Builds a minimal failed fetch Response */
-function buildErrorResponse(status = 500): Response {
-    return new Response("{}", { status });
-}
-
 // FetchRetry has protected/private internals so we access postRetry and
 // getRetry through a concrete instance. buildHeaders is protected so we
 // test it indirectly by inspecting the headers passed to fetch.

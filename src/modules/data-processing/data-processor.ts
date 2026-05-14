@@ -26,7 +26,7 @@ type ParseCSVConfig = {
 class DataProcessor {
     private async parseCSVData(
         parseConfig: ParseCSVConfig,
-        csvData: any
+        csvData: SharedArrayBuffer
     ): Promise<Record<string, string>[]> {
         const decoder = new TextDecoder("utf-16le");
         const csvString = decoder.decode(csvData);
@@ -43,7 +43,7 @@ class DataProcessor {
 
     // Parse the CSV and assemble the data into a JS Array matching our interface, and return it
     public async processMapComparisonsCSV(
-        mapComparisonCSV: any
+        mapComparisonCSV: SharedArrayBuffer
     ): Promise<FlockCasesByState[]> {
         try {
             // Define the columns that we will be reading from
@@ -88,7 +88,7 @@ class DataProcessor {
             return transformedData;
         } catch (error) {
             logger.error(`Error processing CSV Data: ${error}`);
-            throw new Error(`Failed to process CSV Data: ${error}`);
+            throw new Error(`Failed to process CSV Data: ${error}`, { cause: error });
         }
     }
 
@@ -147,7 +147,7 @@ class DataProcessor {
         return [transformedData];
     }
 
-    public async processExportToCsvCSV(exportToCsvData: any): Promise<{
+    public async processExportToCsvCSV(exportToCsvData: SharedArrayBuffer): Promise<{
         site_details: SiteDetails[];
         historical_summary: HistoricalSummary;
         status_summary: StatusTransitionSummary;
@@ -182,7 +182,7 @@ class DataProcessor {
             return transformed;
         } catch (error) {
             logger.error(`Error processing ExportToCsv CSV Data: ${error}`);
-            throw new Error(`Failed to process ExportToCsv CSV Data: ${error}`);
+            throw new Error(`Failed to process ExportToCsv CSV Data: ${error}`, { cause: error });
         }
     }
 }

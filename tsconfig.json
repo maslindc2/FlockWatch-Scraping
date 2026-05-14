@@ -15,7 +15,7 @@
         "files": true
     },
     "compilerOptions": {
-        "target": "es2021",
+        "target": "es2022",
         "module": "nodenext",
         "rootDir": "./src",
         "moduleResolution": "nodenext",

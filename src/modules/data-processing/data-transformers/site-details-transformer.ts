@@ -67,7 +67,8 @@ class SiteDetailsTransformer {
                     `Error transforming row ${index}: ${(error as Error).message}`
                 );
                 throw new Error(
-                    `Data transformation failed at row ${index}: ${(error as Error).message}`
+                    `Data transformation failed at row ${index}: ${(error as Error).message}`,
+                    { cause: error }
                 );
             }
         });

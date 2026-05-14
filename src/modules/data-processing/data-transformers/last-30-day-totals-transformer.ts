@@ -68,7 +68,8 @@ class Last30DaysTransformer {
                 `Error transforming 30-day data: ${(error as Error).message}`
             );
             throw new Error(
-                `30-day data transformation failed: ${(error as Error).message}`
+                `30-day data transformation failed: ${(error as Error).message}`,
+                { cause: error }
             );
         }
     }

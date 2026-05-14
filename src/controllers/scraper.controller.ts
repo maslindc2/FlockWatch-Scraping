@@ -101,7 +101,7 @@ class ScraperController {
         } catch (error) {
             if (this.closed) return Promise.reject(error);
             logger.error("Error processing data: ", error);
-            throw new Error(`Error processing data: ${error}`);
+            throw new Error(`Error processing data: ${error}`, { cause: error });
         }
     }
 }

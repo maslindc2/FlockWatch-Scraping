@@ -45,11 +45,11 @@ class FetchRetry {
             new Promise((resolve) => setTimeout(resolve, ms));
         try {
             return await this.fetchWithTimeout(URL, fetchOptions, timeoutMs);
-        } catch (error: any) {
+        } catch (error) {
             if (retries <= 0) throw error;
 
             logger.error(
-                `Network error contacting Server, retries left ${retries}: ${error.message}`
+                `Network error contacting Server, retries left ${retries}: ${(error as Error).message}`
             );
 
             const attemptNumber = retries;
@@ -85,7 +85,7 @@ class FetchRetry {
      */
     public async postRetry(
         URL: string,
-        data: any,
+        data: unknown,
         retries: number,
         timeoutMs: number,
         baseDelay: number
