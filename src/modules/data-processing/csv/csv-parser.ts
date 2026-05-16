@@ -27,7 +27,9 @@ export class CSVParser {
             }) as unknown as Record<string, string>[];
         } catch (error) {
             logger.error(`Error parsing CSV file: ${error}`);
-            throw new Error(`CSV is malformed resulted in ${error}`, { cause: error });
+            throw new Error(`CSV is malformed resulted in ${error}`, {
+                cause: error,
+            });
         }
     }
 }

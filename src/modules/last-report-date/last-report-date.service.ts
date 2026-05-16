@@ -37,7 +37,9 @@ class LastReportDateService {
             logger.error(
                 `Failed to update the last report date model! Received isSuccessfulUpdate bool value of ${isSuccessfulUpdate} resulted in: ${error}`
             );
-            throw new Error("Failed to update the last report date model!", { cause: error });
+            throw new Error("Failed to update the last report date model!", {
+                cause: error,
+            });
         }
     }
 

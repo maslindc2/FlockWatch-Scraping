@@ -88,7 +88,9 @@ class DataProcessor {
             return transformedData;
         } catch (error) {
             logger.error(`Error processing CSV Data: ${error}`);
-            throw new Error(`Failed to process CSV Data: ${error}`, { cause: error });
+            throw new Error(`Failed to process CSV Data: ${error}`, {
+                cause: error,
+            });
         }
     }
 
@@ -147,7 +149,9 @@ class DataProcessor {
         return [transformedData];
     }
 
-    public async processExportToCsvCSV(exportToCsvData: SharedArrayBuffer): Promise<{
+    public async processExportToCsvCSV(
+        exportToCsvData: SharedArrayBuffer
+    ): Promise<{
         site_details: SiteDetails[];
         historical_summary: HistoricalSummary;
         status_summary: StatusTransitionSummary;
@@ -182,7 +186,10 @@ class DataProcessor {
             return transformed;
         } catch (error) {
             logger.error(`Error processing ExportToCsv CSV Data: ${error}`);
-            throw new Error(`Failed to process ExportToCsv CSV Data: ${error}`, { cause: error });
+            throw new Error(
+                `Failed to process ExportToCsv CSV Data: ${error}`,
+                { cause: error }
+            );
         }
     }
 }

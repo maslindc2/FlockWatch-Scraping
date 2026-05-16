@@ -25,7 +25,9 @@ class DatabaseService {
             logger.info("MongoDB disconnected successfully.");
         } catch (error) {
             logger.error("Failed to disconnect from MongoDB.", error);
-            throw new Error(`MongoDB database failed to disconnect.`, { cause: error });
+            throw new Error(`MongoDB database failed to disconnect.`, {
+                cause: error,
+            });
         }
     }
 }
