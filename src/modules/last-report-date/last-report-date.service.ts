@@ -17,7 +17,7 @@ class LastReportDateService {
             .lean();
     }
 
-    public async updateLastReportDate(isSuccessfulUpdate: Boolean) {
+    public async updateLastReportDate(isSuccessfulUpdate: boolean) {
         // Model object contains today's timestamp, and the newly created authID
         let modelObj;
         if (isSuccessfulUpdate) {
@@ -37,7 +37,9 @@ class LastReportDateService {
             logger.error(
                 `Failed to update the last report date model! Received isSuccessfulUpdate bool value of ${isSuccessfulUpdate} resulted in: ${error}`
             );
-            throw new Error("Failed to update the last report date model!");
+            throw new Error("Failed to update the last report date model!", {
+                cause: error,
+            });
         }
     }
 

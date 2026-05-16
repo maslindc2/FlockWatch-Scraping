@@ -16,7 +16,12 @@ const scrapeLimiter = rateLimit({
     skip: () => process.env.NODE_ENV === "test",
 });
 
-// This is our fetch data route where we receive a GET request for getting the latest Avian Influenza data
+/**
+ * GET /get-data
+ * Fetches the latest Avian Influenza data by running a scrape job.
+ * Protected by rate limiting and Bearer token auth (the auth ID in MongoDB).
+ * On success returns the full FlockData JSON. On failure returns a 500 error.
+ */
 router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
     // Store the authentication ID we got from Flock Watch Server
     const authHeader = req.headers.authorization;

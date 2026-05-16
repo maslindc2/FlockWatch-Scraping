@@ -25,14 +25,13 @@ class FetchRetry {
         }
     }
     /**
-     * Responsible for Retrying our fetch operation if we encounter any network issues with our initial fetch operation
-     * @param url This the URL we are making the fetch operation
-     * @param retries Number of times we want to retry our fetch operation
-     * @param timeoutMs How long to wait for our request to time out
-     * @param baseDelay How long we should wait before retrying our fetch operation
-     * @param authID Auth ID we are sending in our fetch operation
-     * @param flockData Data we are sending in our fetch operation
-     * @returns Response Promise
+     * Fetches with retry logic using exponential backoff and jitter on network errors.
+     * @param URL - The URL to fetch.
+     * @param retries - Number of remaining retry attempts.
+     * @param timeoutMs - Timeout in milliseconds per attempt.
+     * @param baseDelay - Base delay in ms for exponential backoff.
+     * @param fetchOptions - The RequestInit options for the fetch call.
+     * @returns A promise resolving to the Response.
      */
     private async fetchWithRetry(
         URL: string,
@@ -45,11 +44,11 @@ class FetchRetry {
             new Promise((resolve) => setTimeout(resolve, ms));
         try {
             return await this.fetchWithTimeout(URL, fetchOptions, timeoutMs);
-        } catch (error: any) {
+        } catch (error) {
             if (retries <= 0) throw error;
 
             logger.error(
-                `Network error contacting Server, retries left ${retries}: ${error.message}`
+                `Network error contacting Server, retries left ${retries}: ${(error as Error).message}`
             );
 
             const attemptNumber = retries;
@@ -85,7 +84,7 @@ class FetchRetry {
      */
     public async postRetry(
         URL: string,
-        data: any,
+        data: unknown,
         retries: number,
         timeoutMs: number,
         baseDelay: number

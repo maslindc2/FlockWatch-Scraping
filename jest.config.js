@@ -8,16 +8,14 @@ const tsJestTransform = {
         "ts-jest",
         {
             tsconfig: {
-                module: "commonjs",
-                moduleResolution: "node",
+                module: "node16",
+                moduleResolution: "node16",
             },
         },
     ],
 };
 
 module.exports = {
-    preset: "ts-jest",
-
     // ---------------------------------------------------------------------------
     // Coverage - must live at the ROOT level, not inside individual projects.
     // Jest ignores coverageDirectory and related options when they are nested
@@ -39,7 +37,6 @@ module.exports = {
     projects: [
         {
             displayName: "unit",
-            preset: "ts-jest",
             testEnvironment: "node",
             testMatch: ["<rootDir>/tests/unit/**/*.test.ts"],
             testPathIgnorePatterns: [".stryker-temp/"],
@@ -51,7 +48,6 @@ module.exports = {
         },
         {
             displayName: "integration",
-            preset: "ts-jest",
             testEnvironment: "node",
             testMatch: ["<rootDir>/tests/integration/**/*.test.ts"],
             testPathIgnorePatterns: [".stryker-temp/"],
@@ -63,7 +59,6 @@ module.exports = {
         },
         {
             displayName: "system",
-            preset: "ts-jest",
             testEnvironment: "node",
             testMatch: ["<rootDir>/tests/system/**/*.test.ts"],
             testPathIgnorePatterns: [".stryker-temp/"],

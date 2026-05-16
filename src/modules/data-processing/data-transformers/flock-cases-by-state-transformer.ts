@@ -9,8 +9,8 @@ class FlockCasesByStateTransformer {
     /**
      * Transform data's responsibility is to transform the data we extracted from the Map Comparisons.csv
      * into the structure needed for our Flock Cases by state model.
-     * @param parsedData: Record containing the column and the value
-     * @returns: Structured object for our Flock Watch Server to update the models, is of type IFlockCases
+     * @param parsedData - Record containing the column and the value
+     * @returns Structured object for our Flock Watch Server to update the models, is of type IFlockCases
      */
     public static transformData(
         parsedData: Record<string, string>[]
@@ -102,7 +102,8 @@ class FlockCasesByStateTransformer {
                     `Error transforming row ${index}: ${(error as Error).message}`
                 );
                 throw new Error(
-                    `Data transformation failed at row ${index}: ${(error as Error).message}`
+                    `Data transformation failed at row ${index}: ${(error as Error).message}`,
+                    { cause: error }
                 );
             }
         });

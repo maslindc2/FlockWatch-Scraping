@@ -24,10 +24,12 @@ export class CSVParser {
                 columns: columns,
                 trim: true,
                 skip_records_with_empty_values: true,
-            });
+            }) as unknown as Record<string, string>[];
         } catch (error) {
             logger.error(`Error parsing CSV file: ${error}`);
-            throw new Error(`CSV is malformed resulted in ${error}`);
+            throw new Error(`CSV is malformed resulted in ${error}`, {
+                cause: error,
+            });
         }
     }
 }

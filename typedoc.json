@@ -1,0 +1,14 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["./src"],
+    "entryPointStrategy": "expand",
+    "out": "docs",
+    "name": "FlockWatch Scraping",
+    "includeVersion": true,
+    "excludeExternals": true,
+    "excludePrivate": false,
+    "excludeProtected": false,
+    "categorizeByGroup": true,
+    "searchInComments": true,
+    "plugin": []
+}

@@ -5,7 +5,17 @@ import {
     StatusTransitionSummary,
 } from "../site-details.interface";
 
+/**
+ * Transforms parsed CSV row data into structured SiteDetails, HistoricalSummary,
+ * and StatusTransitionSummary objects used by Flock Watch Server.
+ */
 class SiteDetailsTransformer {
+    /**
+     * Transforms an array of parsed CSV rows into site details and summary objects.
+     * Each row is validated for required fields; invalid rows are rejected with an error.
+     * @param parsedData - Array of key-value pairs representing CSV rows.
+     * @returns An object containing site_details array, historical_summary, and status_summary.
+     */
     public static transformData(parsedData: Record<string, string>[]): {
         site_details: SiteDetails[];
         historical_summary: HistoricalSummary;
@@ -67,7 +77,8 @@ class SiteDetailsTransformer {
                     `Error transforming row ${index}: ${(error as Error).message}`
                 );
                 throw new Error(
-                    `Data transformation failed at row ${index}: ${(error as Error).message}`
+                    `Data transformation failed at row ${index}: ${(error as Error).message}`,
+                    { cause: error }
                 );
             }
         });
@@ -82,6 +93,11 @@ class SiteDetailsTransformer {
         };
     }
 
+    /**
+     * Parses a date string in DD-Mon-YY format (e.g., "15-Jan-25") into a Date object.
+     * @param dateStr - The date string to parse.
+     * @returns The parsed Date object.
+     */
     private static parseDDMonYY(dateStr: string): Date {
         const monthMap: Record<string, number> = {
             Jan: 0,
@@ -132,6 +148,13 @@ class SiteDetailsTransformer {
         return date;
     }
 
+    /**
+     * Parses the status value from a CSV row into a structured status object.
+     * "Active" becomes { status: "active" }, "NA" becomes { status: "na" },
+     * and a date string becomes { status: "released", releasedDate: Date }.
+     * @param value - The raw status string from the CSV.
+     * @returns An object with the parsed status and optional release date.
+     */
     private static parseStatus(value: string): {
         status: "active" | "released" | "na";
         releasedDate?: Date;
@@ -155,6 +178,12 @@ class SiteDetailsTransformer {
         }
     }
 
+    /**
+     * Computes a historical summary from all site details, including total birds affected,
+     * active/released/NA site counts, and total birds currently in active sites.
+     * @param siteDetails - The array of parsed site details.
+     * @returns A HistoricalSummary object with aggregated statistics.
+     */
     private static computeHistoricalSummary(
         siteDetails: SiteDetails[]
     ): HistoricalSummary {
@@ -191,6 +220,12 @@ class SiteDetailsTransformer {
         };
     }
 
+    /**
+     * Computes a summary of status transitions in the last 30 days,
+     * including newly confirmed sites, released sites, and birds affected.
+     * @param siteDetails - The array of parsed site details.
+     * @returns A StatusTransitionSummary with last-30-day counts.
+     */
     private static computeStatusTransitionSummary(
         siteDetails: SiteDetails[]
     ): StatusTransitionSummary {

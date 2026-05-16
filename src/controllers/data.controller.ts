@@ -1,12 +1,19 @@
 import { LastReportDateService } from "../modules/last-report-date/last-report-date.service";
 import { logger } from "../utils/winston-logger";
 
+/**
+ * Handles data-related operations by delegating to the LastReportDateService.
+ * Provides methods for retrieving the server auth ID and last scraped date from MongoDB.
+ */
 class DataController {
     private lastReportDateService: LastReportDateService;
     constructor() {
         this.lastReportDateService = new LastReportDateService();
     }
-    // get the auth ID from our last report date service and return a promise of type string
+    /**
+     * Retrieves the auth ID from the last report date service.
+     * @returns A promise resolving to the auth ID string, or empty string on failure.
+     */
     public async getServerAuthID(): Promise<string> {
         try {
             const data = await this.lastReportDateService.getAuthID();
@@ -16,6 +23,11 @@ class DataController {
             return "";
         }
     }
+    /**
+     * Retrieves the last scraped date from MongoDB via LastReportDateService.
+     * @returns A promise resolving to the date string.
+     * @throws If the date document or date field is missing.
+     */
     public async getLastScrapedDate(): Promise<string> {
         try {
             const data = await this.lastReportDateService.getLastScrapedDate();
