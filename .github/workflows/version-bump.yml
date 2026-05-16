@@ -1,53 +1,57 @@
-name: Auto Version Bump
-
+name: Lint and Jest Tests
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "**.md"
+      - .gitignore
+      - LICENSE
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+      - .gitignore
+      - LICENSE
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  statuses: write
 
 jobs:
-  version-bump:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+  lint:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
+          node-version: ${{ secrets.NODE_VERSION }}
+          cache: "npm"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - run: npm ci
+
+      - run: npm run lint
+
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [unit, integration]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ secrets.NODE_VERSION }}
+          cache: "npm"
 
-      - name: Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - run: npm ci
 
-      - name: Delete existing tag if present
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v$VERSION"
-          git tag -d "$TAG" 2>/dev/null || true
-          git push origin ":refs/tags/$TAG" 2>/dev/null || true
-
-      - name: Bump version and create tag
-        run: npx commit-and-tag-version --no-verify
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: chore/version-bump
-          delete-branch: true
-          title: "chore: version bump [skip ci]"
-          body: "Automated version bump from commit-and-tag-version."
-          commit-message: "chore: version bump [skip ci]"
-          labels: automated
+      - run: npm run test:${{ matrix.suite }}
