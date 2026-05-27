@@ -28,14 +28,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ secrets.NODE_VERSION }}
           cache: "npm"
-
       - run: npm ci
-
       - run: npm run lint
 
   tests:
@@ -46,12 +43,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ secrets.NODE_VERSION }}
           cache: "npm"
-
       - run: npm ci
-
       - run: npm run test:${{ matrix.suite }}
+
+  # Sentinel job — this is what branch protection should require
+  ci-status:
+    if: always()
+    needs: [lint, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks passed or cancelled (not failed)
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            echo "One or more jobs failed."
+            exit 1
+          fi
+          echo "All jobs succeeded or were cancelled by a newer run."
