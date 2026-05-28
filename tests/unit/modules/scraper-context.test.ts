@@ -28,9 +28,7 @@ jest.mock("playwright", () => ({
 
 describe("ScraperContext", () => {
     beforeEach(() => {
-        mockNewPage = jest
-            .fn()
-            .mockResolvedValue({ addInitScript: jest.fn() });
+        mockNewPage = jest.fn().mockResolvedValue({ addInitScript: jest.fn() });
         mockNewContext = jest.fn().mockResolvedValue({ newPage: mockNewPage });
         mockBrowserClose = jest.fn().mockResolvedValue(undefined);
         mockBrowser = {
