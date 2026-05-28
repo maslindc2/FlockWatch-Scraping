@@ -19,10 +19,15 @@ class USDAScrapingService {
         this.scrapeURL = scrapeContext.getURLToScrape();
     }
 
+    private async humanDelay(): Promise<void> {
+        await this.page.waitForTimeout(500 + Math.random() * 1500);
+    }
+
     // Select the flock data we want, for this it's all flocks we want the data for
     private async selectFlockType(): Promise<void> {
         // Using the label to target the drop down menu
         await this.page.getByLabel("Choose variable Birds Affected").click();
+        await this.humanDelay();
         // Selecting the All Flocks menu item
         await this.page.getByRole("menuitem", { name: "All Flocks" }).click();
     }
@@ -30,6 +35,7 @@ class USDAScrapingService {
     private async selectTimePeriod(): Promise<void> {
         // Using the label to target the drop down menu for the time period
         await this.page.getByLabel("Choose time period Last 30 Days").click();
+        await this.humanDelay();
         // Selecting the Total Outbreak menu item
         await this.page
             .getByRole("menuitem", { name: "Total Outbreak" })
@@ -41,8 +47,10 @@ class USDAScrapingService {
         await this.page
             .locator('[role="button"]:has-text("Download Data")')
             .click();
+        await this.humanDelay();
         // Select the map comparisons option which contains all of the data
         await this.page.getByTitle(sheetTitle).click();
+        await this.humanDelay();
         // Using the test id find the label for the csv button as we can't click the radio button due to supressClickBusting
         await this.page
             .getByTestId("crosstab-options-dialog-radio-csv-Label")
@@ -81,11 +89,14 @@ class USDAScrapingService {
         try {
             // Go to the URL we want to scrape
             await this.page.goto(this.scrapeURL);
+            await this.humanDelay();
             // Select the flock type we want for our data
             await this.selectFlockType();
+            await this.humanDelay();
             // Select the time period we want
             await this.selectTimePeriod();
 
+            await this.humanDelay();
             // Select the download options we want
             await this.selectDownloadOptions("Map Comparisons");
             // Get the download URL
@@ -127,6 +138,7 @@ class USDAScrapingService {
         try {
             // Go to the URL we want to scrape
             await this.page.goto(this.scrapeURL);
+            await this.humanDelay();
 
             // Go straight to download options as it does not matter if we select the flock type or the time period
             // The Affected Totals.csv will always be the last 30 days
@@ -190,12 +202,14 @@ class USDAScrapingService {
     public async getExportToCsvData(): Promise<SharedArrayBuffer> {
         try {
             await this.page.goto(this.scrapeURL);
+            await this.humanDelay();
 
             // This is where we normally would select the options for the data we want, however for the ExportToCsv the option is already selected for us.
             // So we have to click the Download button and the CSV option to get the download URL, but we don't have to select any options beforehand
             await this.page
                 .locator('[role="button"]:has-text("Download Data")')
                 .click();
+            await this.humanDelay();
             await this.page
                 .getByTestId("crosstab-options-dialog-radio-csv-Label")
                 .click();

@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: flockwatch-scraper
+    ports:
+      - "4000:4000"
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      AUTO_UPDATE: "true"
+      CRON: "${CRON:-10 12 * * 1-5}"
+    restart: unless-stopped
