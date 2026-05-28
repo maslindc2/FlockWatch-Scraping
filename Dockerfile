@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci
-RUN PLAYWRIGHT_BROWSERS_PATH=/app/browsers npx playwright install chromium
+RUN PLAYWRIGHT_BROWSERS_PATH=/opt/playwright npx playwright install chromium
 
 COPY tsconfig.json ./
 COPY src/ src/
@@ -23,12 +23,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/browsers ./browsers
+COPY --from=build /opt/playwright /opt/playwright
 
-RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app /opt/playwright
 USER appuser
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/app/browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
 
 EXPOSE 4000
 
