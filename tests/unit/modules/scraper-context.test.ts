@@ -28,7 +28,7 @@ jest.mock("playwright", () => ({
 
 describe("ScraperContext", () => {
     beforeEach(() => {
-        mockNewPage = jest.fn().mockResolvedValue({});
+        mockNewPage = jest.fn().mockResolvedValue({ addInitScript: jest.fn() });
         mockNewContext = jest.fn().mockResolvedValue({ newPage: mockNewPage });
         mockBrowserClose = jest.fn().mockResolvedValue(undefined);
         mockBrowser = {
@@ -102,7 +102,16 @@ describe("ScraperContext", () => {
 
             await ctx.setupBrowser();
 
-            expect(mockChromiumLaunch).toHaveBeenCalledWith({ headless: true });
+            expect(mockChromiumLaunch).toHaveBeenCalledWith({
+                headless: true,
+                args: [
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-infobars",
+                    "--window-size=1920,1080",
+                ],
+            });
         });
 
         it("launches chromium with headless=false when specified", async () => {
@@ -116,6 +125,13 @@ describe("ScraperContext", () => {
 
             expect(mockChromiumLaunch).toHaveBeenCalledWith({
                 headless: false,
+                args: [
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-infobars",
+                    "--window-size=1920,1080",
+                ],
             });
         });
 
@@ -156,7 +172,7 @@ describe("ScraperContext", () => {
         });
 
         it("getPage returns the page instance after setupBrowser", async () => {
-            const mockPage = { isClosed: jest.fn() };
+            const mockPage = { isClosed: jest.fn(), addInitScript: jest.fn() };
             mockNewPage.mockResolvedValueOnce(mockPage);
             const ctx = new ScraperContext(
                 true,
