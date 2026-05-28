@@ -16,5 +16,4 @@ playwright.config.ts
 jest.config.js
 jest.setup.ts
 setup-jest.js
-tsconfig.json
 .env
