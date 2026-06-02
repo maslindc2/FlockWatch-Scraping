@@ -4,6 +4,7 @@ import { DataController } from "../controllers/data.controller";
 import { logger } from "../utils/winston-logger";
 
 import { ScraperController } from "../controllers/scraper.controller";
+import { timingSafeEqual } from "crypto";
 
 const router = Router();
 
@@ -34,8 +35,16 @@ router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
     // Get the AuthID from our MongoDB (this is the same model shared between FlockWatch Server and FlockWatch Scraping)
     const expectedAuthID = await dataController.getServerAuthID();
 
+
     // If the Auth ID matches
-    if (receivedAuthID === expectedAuthID) {
+    if (!receivedAuthID ||
+        !expectedAuthID ||
+        receivedAuthID !== expectedAuthID ||
+        !timingSafeEqual(
+            Buffer.from(receivedAuthID),
+            Buffer.from(expectedAuthID)
+        )
+    ) {
         // Report that we are scraping
         logger.info(`Received valid scrape request! Starting job...`);
         // Create the scraper controller instance
