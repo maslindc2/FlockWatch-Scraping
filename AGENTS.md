@@ -43,20 +43,27 @@ HTTP POST (via FetchRetry with exponential backoff + jitter)
 
 ### Module Layout
 
-| Module | Responsibility |
+| File | Responsibility |
 |---|---|
-| `controllers/scraper.controller.ts` | Orchestrates full scrape lifecycle |
-| `controllers/data.controller.ts` | Reads auth ID and last scraped date from DB |
-| `modules/scraper/` | Playwright browser automation against USDA Tableau |
-| `modules/data-processing/` | CSV parsing + data transformation pipeline |
+| `server.ts` | Entry point; loads env, connects to MongoDB, starts Express |
+| `app.ts` | Express app with middleware (helmet, compression, CORS, rate limit), cron setup |
+| `controllers/scraper.controller.ts` | Orchestrates full scrape lifecycle; creates `ScraperContext` + `USDAScrapingService` + `DataProcessor` |
+| `controllers/data.controller.ts` | Delegates to `LastReportDateService` for auth ID and last scraped date |
+| `modules/scraper/scraper.context.ts` | Playwright browser setup (Chromium, stealth config, viewport) |
+| `modules/scraper/usda-scraping.service.ts` | Automates Tableau UI (flock type, time period, download buttons), returns `SharedArrayBuffer` CSVs |
+| `modules/data-processing/data-processor.ts` | Orchestrates CSV parsing → transformation for all 3 data sources |
 | `modules/data-processing/csv/` | Raw CSV string → `Record<string, string>[]` |
 | `modules/data-processing/data-transformers/` | Row data → typed interfaces |
-| `modules/fetch-retry/` | HTTP POST/GET with exponential backoff + jitter |
-| `modules/last-report-date/` | Mongoose model for scrape tracking (date + auth_id) |
-| `modules/update-data/` | SelfUpdate: checks if DB is >24h old, triggers re-scrape |
-| `routes/` | Express route definitions |
-| `db/` | MongoDB connection via Mongoose |
-| `utils/` | Winston logger |
+| `modules/data-processing/*.interface.ts` | Typed interfaces for `FlockCasesByState`, `Last30Days`, `SiteDetails` (incl. `HistoricalSummary`, `StatusTransitionSummary`) |
+| `modules/fetch-retry/fetch-retry.ts` | HTTP POST/GET with exponential backoff + jitter |
+| `modules/fetch-retry/fetch-retry-authID.ts` | Extends `FetchRetry` with Bearer token auth |
+| `modules/last-report-date/last-report-date.interface.ts` | Mongoose document interface (`last_scraped_date`, `auth_id`) |
+| `modules/last-report-date/last-report-date.model.ts` | Mongoose schema + model |
+| `modules/last-report-date/last-report-date.service.ts` | CRUD operations for last report date |
+| `modules/update-data/self-update.service.ts` | Checks if DB is >24h old, triggers re-scrape, returns `FlockData` |
+| `routes/scraper.routes.ts` | Express route `GET /get-data` with rate limiting + Bearer auth |
+| `db/database.service.ts` | MongoDB connection via Mongoose (connect/disconnect) |
+| `utils/winston-logger.ts` | Winston logger with console transport |
 
 ### Key Interfaces
 
@@ -67,7 +74,7 @@ HTTP POST (via FetchRetry with exponential backoff + jitter)
 | `SiteDetails` | `special_id`, `county`, `state`, `production_type`, `confirmed_diagnosis_date`, `status`, `control_area_released_date?`, `birds_affected` |
 | `HistoricalSummary` | `total_birds_affected_all_time`, `total_sites_all_time`, `total_active_sites`, `total_released_sites`, `total_na_sites`, `total_birds_active` |
 | `StatusTransitionSummary` | `sites_confirmed_last_30_days`, `sites_released_last_30_days`, `birds_affected_last_30_days` |
-| `LastReportDate` | `last_scraped_date`, `auth_id` |
+| `LastReportDate` | `last_scraped_date`, `auth_id` (extends Mongoose.Document) |
 
 ## Environment Variables
 
@@ -103,7 +110,7 @@ The project includes a `.devcontainer/` with Docker Compose that provisions both
 
 - ES module imports (no default exports except for the Express router).
 - Classes export via named export: `export { ClassName }`.
-- Interfaces in dedicated `*.interface.ts` files.
+- Interfaces in dedicated `*.interface.ts` files, exported via `export type { InterfaceName }`.
 - Transformers are stateless classes with `static transformData()`.
 - Error handling: always `throw new Error(msg, { cause })` in catch blocks.
 - Logger: use `import { logger } from "../../utils/winston-logger"`.
