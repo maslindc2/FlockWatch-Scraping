@@ -35,7 +35,7 @@ router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
     // Get the AuthID from our MongoDB (this is the same model shared between FlockWatch Server and FlockWatch Scraping)
     const expectedAuthID = await dataController.getServerAuthID();
 
-    // If the Auth ID matches
+    // If the Auth ID does not match, reject with 403
     if (
         !receivedAuthID ||
         !expectedAuthID ||
@@ -45,33 +45,32 @@ router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
             Buffer.from(expectedAuthID)
         )
     ) {
-        // Report that we are scraping
-        logger.info(`Received valid scrape request! Starting job...`);
-        // Create the scraper controller instance
-        const scrapeController = new ScraperController(
-            true,
-            "data-tb-test-id",
-            process.env.SCRAPE_URL!
-        );
-
-        // Listen for our client disconnecting, if that occurs kill the scrape job
-        req.on("close", () => {
-            scrapeController.stopScrapeJob();
-        });
-        try {
-            const flockData = await scrapeController.runScrapeJob();
-            logger.info("Finished scrape job and now sending data to client!");
-            res.json(flockData);
-            if (res.headersSent) logger.info("Sent data to client!");
-        } catch (error) {
-            logger.error("Error processing data: ", error);
-            res.status(500).json({ error: "Failed to process data" });
-        } finally {
-            scrapeController.stopScrapeJob();
-        }
-    } else {
         logger.error(`Invalid Auth ID from IP ${req.ip}!`);
         res.sendStatus(403);
+        return;
+    }
+
+    // Auth validated — proceed with scrape
+    logger.info(`Received valid scrape request! Starting job...`);
+    const scrapeController = new ScraperController(
+        true,
+        "data-tb-test-id",
+        process.env.SCRAPE_URL!
+    );
+
+    req.on("close", () => {
+        scrapeController.stopScrapeJob();
+    });
+    try {
+        const flockData = await scrapeController.runScrapeJob();
+        logger.info("Finished scrape job and now sending data to client!");
+        res.json(flockData);
+        if (res.headersSent) logger.info("Sent data to client!");
+    } catch (error) {
+        logger.error("Error processing data: ", error);
+        res.status(500).json({ error: "Failed to process data" });
+    } finally {
+        scrapeController.stopScrapeJob();
     }
 });
 
