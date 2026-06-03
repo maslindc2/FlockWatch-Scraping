@@ -35,9 +35,9 @@ router.get("/get-data", scrapeLimiter, async (req: Request, res: Response) => {
     // Get the AuthID from our MongoDB (this is the same model shared between FlockWatch Server and FlockWatch Scraping)
     const expectedAuthID = await dataController.getServerAuthID();
 
-
     // If the Auth ID matches
-    if (!receivedAuthID ||
+    if (
+        !receivedAuthID ||
         !expectedAuthID ||
         receivedAuthID !== expectedAuthID ||
         !timingSafeEqual(
