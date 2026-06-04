@@ -28,7 +28,7 @@
     "homepage": "https://github.com/maslindc2/FlockWatch-Scraping#readme",
     "description": "",
     "dependencies": {
-        "axios": "^1.16.1",
+        "axios": "^1.17.0",
         "compression": "^1.8.1",
         "cors": "^2.8.6",
         "cron": "^4.4.0",
@@ -56,7 +56,7 @@
         "eslint": "^10.4.1",
         "globals": "^17.6.0",
         "jest": "^30.4.2",
-        "mongodb-memory-server": "^11.1.0",
+        "mongodb-memory-server": "^11.2.0",
         "nodemon": "^3.1.14",
         "prettier": "^3.8.3",
         "supertest": "^7.2.2",
