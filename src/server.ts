@@ -1,8 +1,8 @@
-import * as dotenv from "dotenv";
+import * as dotenvx from "@dotenvx/dotenvx";
 import { App } from "./app";
 import { logger } from "./utils/winston-logger";
 
-dotenv.config();
+dotenvx.config();
 
 /**
  * The port the server listens on, derived from the PORT env variable or defaults to 8080.
