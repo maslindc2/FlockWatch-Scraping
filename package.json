@@ -28,7 +28,7 @@
     "homepage": "https://github.com/maslindc2/FlockWatch-Scraping#readme",
     "description": "",
     "dependencies": {
-        "axios": "^1.16.1",
+        "axios": "^1.17.0",
         "compression": "^1.8.1",
         "cors": "^2.8.6",
         "cron": "^4.4.0",
