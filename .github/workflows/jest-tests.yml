@@ -39,10 +39,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [unit, integration]
+        suite: [unit, integration, system]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout FlockWatch-Server (needed by system tests)
+        if: ${{ matrix.suite == 'system' }}
+        uses: actions/checkout@v4
+        with:
+          repository: maslindc2/FlockWatch-Server
+          path: ../FlockWatch-Server
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ secrets.NODE_VERSION }}
