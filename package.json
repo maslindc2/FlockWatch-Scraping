@@ -43,7 +43,7 @@
         "winston": "^3.19.0"
     },
     "devDependencies": {
-        "@dotenvx/dotenvx": "^1.71.0",
+        "@dotenvx/dotenvx": "^1.74.3",
         "@eslint/js": "^10.0.1",
         "@playwright/test": "^1.60.0",
         "@types/compression": "^1.8.1",
