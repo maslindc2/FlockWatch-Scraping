@@ -45,7 +45,7 @@
     "devDependencies": {
         "@dotenvx/dotenvx": "^1.74.3",
         "@eslint/js": "^10.0.1",
-        "@playwright/test": "^1.60.0",
+        "@playwright/test": "^1.61.1",
         "@types/compression": "^1.8.1",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
