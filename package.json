@@ -1,6 +1,6 @@
 {
     "name": "flockwatch-scraping",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "main": "index.js",
     "scripts": {
         "test": "jest --coverage",
@@ -51,7 +51,7 @@
         "@types/express": "^5.0.6",
         "@types/express-rate-limit": "^6.0.2",
         "@types/jest": "^30.0.0",
-        "@types/node": "^25.9.2",
+        "@types/node": "^26.1.1",
         "@types/supertest": "^7.2.0",
         "eslint": "^10.4.1",
         "globals": "^17.6.0",
