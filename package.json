@@ -1,6 +1,6 @@
 {
     "name": "flockwatch-scraping",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "main": "index.js",
     "scripts": {
         "test": "jest --coverage",
