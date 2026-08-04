@@ -205,13 +205,13 @@ class USDAScrapingService {
             await this.humanDelay();
 
             // Provides us with the birds affected in the last 30 days. We do not need to change the variable or time period, but we do need to select the ExportToCsv option.
-            // This provides us with a clean CSV file for processing the latest infections. 
+            // This provides us with a clean CSV file for processing the latest infections.
             // We then click the Download button and the CSV option to get the download URL.
             await this.page
                 .locator('[role="button"]:has-text("Download Data")')
                 .click();
             await this.humanDelay();
-            
+
             await this.page.getByTitle("ExportToCsv").click();
             await this.humanDelay();
 

@@ -102,7 +102,7 @@ class ScraperController {
             // Process the mapComparisons CSV
             const flockCasesByState: FlockCasesByState[] =
                 await dataProcessor.processMapComparisonsCSV(mapComparisonCSV);
-            
+
             // Process the last 30 day totals
             const periodSummaries: Last30Days[] =
                 await dataProcessor.processLast30DayTotalsCSVs(
