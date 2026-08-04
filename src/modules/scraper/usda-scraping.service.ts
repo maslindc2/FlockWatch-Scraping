@@ -204,12 +204,17 @@ class USDAScrapingService {
             await this.page.goto(this.scrapeURL);
             await this.humanDelay();
 
-            // This is where we normally would select the options for the data we want, however for the ExportToCsv the option is already selected for us.
-            // So we have to click the Download button and the CSV option to get the download URL, but we don't have to select any options beforehand
+            // Provides us with the birds affected in the last 30 days. We do not need to change the variable or time period, but we do need to select the ExportToCsv option.
+            // This provides us with a clean CSV file for processing the latest infections.
+            // We then click the Download button and the CSV option to get the download URL.
             await this.page
                 .locator('[role="button"]:has-text("Download Data")')
                 .click();
             await this.humanDelay();
+
+            await this.page.getByTitle("ExportToCsv").click();
+            await this.humanDelay();
+
             await this.page
                 .getByTestId("crosstab-options-dialog-radio-csv-Label")
                 .click();
