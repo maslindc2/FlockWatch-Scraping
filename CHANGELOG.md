@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.17](https://github.com/maslindc2/FlockWatch-Scraping/compare/v0.0.15...v0.0.17) (2026-08-04)
+
+
+### Bug Fixes
+
+* Improved the selection options for the data. USDA has added new options which broke the scraper for collecting last 30 day bird infections. ([bbd8fbc](https://github.com/maslindc2/FlockWatch-Scraping/commit/bbd8fbc9c262a281d543102abd6b0e625f2ca6ea))
+
 ## [0.0.16](https://github.com/maslindc2/FlockWatch-Scraping/compare/v0.0.14...v0.0.16) (2026-08-04)
 
 
