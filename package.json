@@ -1,6 +1,6 @@
 {
     "name": "flockwatch-scraping",
-    "version": "0.0.19",
+    "version": "0.0.21",
     "main": "index.js",
     "scripts": {
         "test": "jest --coverage",
@@ -45,7 +45,7 @@
     "devDependencies": {
         "@dotenvx/dotenvx": "^1.74.3",
         "@eslint/js": "^10.0.1",
-        "@playwright/test": "^1.61.1",
+        "@playwright/test": "^1.62.1",
         "@types/compression": "^1.8.1",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
