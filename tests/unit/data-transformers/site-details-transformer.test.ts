@@ -233,6 +233,67 @@ describe("SiteDetailsTransformer", () => {
     });
 
     // -------------------------------------------------------------------------
+    // Date parsing (YYYY-MM-DD)
+    // -------------------------------------------------------------------------
+    describe("transformData - YYYY-MM-DD date parsing", () => {
+        it("parses 2026-07-13 correctly", () => {
+            const result = SiteDetailsTransformer.transformData([
+                buildValidRow({ "Confirmed Diagnosis": "2026-07-13" }),
+            ]);
+            const date = result.site_details[0].confirmed_diagnosis_date;
+            expect(date.getUTCFullYear()).toBe(2026);
+            expect(date.getUTCMonth()).toBe(6); // July = 6
+            expect(date.getUTCDate()).toBe(13);
+        });
+
+        it("parses 2025-01-01 correctly", () => {
+            const result = SiteDetailsTransformer.transformData([
+                buildValidRow({ "Confirmed Diagnosis": "2025-01-01" }),
+            ]);
+            const date = result.site_details[0].confirmed_diagnosis_date;
+            expect(date.getUTCFullYear()).toBe(2025);
+            expect(date.getUTCMonth()).toBe(0); // January = 0
+            expect(date.getUTCDate()).toBe(1);
+        });
+
+        it("parses a YYYY-MM-DD Control Area Released date", () => {
+            const result = SiteDetailsTransformer.transformData([
+                buildValidRow({ "Control Area Released": "2026-08-02" }),
+            ]);
+            expect(result.site_details[0].status).toBe("released");
+            const date = result.site_details[0]
+                .control_area_released_date as Date;
+            expect(date.getUTCFullYear()).toBe(2026);
+            expect(date.getUTCMonth()).toBe(7); // August = 7
+            expect(date.getUTCDate()).toBe(2);
+        });
+
+        it("throws when the month is out of range", () => {
+            expect(() =>
+                SiteDetailsTransformer.transformData([
+                    buildValidRow({ "Confirmed Diagnosis": "2026-13-01" }),
+                ])
+            ).toThrow(/Invalid date value/);
+        });
+
+        it("throws when the day is out of range", () => {
+            expect(() =>
+                SiteDetailsTransformer.transformData([
+                    buildValidRow({ "Confirmed Diagnosis": "2026-02-31" }),
+                ])
+            ).toThrow(/Invalid date value/);
+        });
+
+        it("throws when the date string has no recognisable pattern", () => {
+            expect(() =>
+                SiteDetailsTransformer.transformData([
+                    buildValidRow({ "Confirmed Diagnosis": "No date here" }),
+                ])
+            ).toThrow(/Invalid date format/);
+        });
+    });
+
+    // -------------------------------------------------------------------------
     // Missing required fields
     // -------------------------------------------------------------------------
     describe("transformData - missing required fields", () => {

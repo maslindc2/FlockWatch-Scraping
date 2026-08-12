@@ -49,7 +49,7 @@ class SiteDetailsTransformer {
                     return;
                 }
 
-                const confirmed_diagnosis_date = this.parseDDMonYY(
+                const confirmed_diagnosis_date = this.parseDate(
                     confirmed_diagnosis_str
                 );
 
@@ -94,11 +94,25 @@ class SiteDetailsTransformer {
     }
 
     /**
-     * Parses a date string in DD-Mon-YY format (e.g., "15-Jan-25") into a Date object.
+     * Parses a date string into a Date object. Supports both the USDA's new
+     * YYYY-MM-DD format (e.g., "2026-07-13") and the legacy DD-Mon-YY format
+     * (e.g., "15-Jan-25").
      * @param dateStr - The date string to parse.
      * @returns The parsed Date object.
      */
-    private static parseDDMonYY(dateStr: string): Date {
+    private static parseDate(dateStr: string): Date {
+        const trimmed = dateStr.trim();
+
+        const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+        if (isoMatch) {
+            const year = parseInt(isoMatch[1], 10);
+            const month = parseInt(isoMatch[2], 10) - 1;
+            const day = parseInt(isoMatch[3], 10);
+
+            return this.buildValidatedDate(dateStr, year, month, day);
+        }
+
         const monthMap: Record<string, number> = {
             Jan: 0,
             Feb: 1,
@@ -114,11 +128,10 @@ class SiteDetailsTransformer {
             Dec: 11,
         };
 
-        const trimmed = dateStr.trim();
         const match = trimmed.match(/^(\d{2})-(\w{3})-(\d{2})$/);
 
         if (!match) {
-            logger.error(`Date ${dateStr} did not match the DD-Mon-YY REGEX!`);
+            logger.error(`Date ${dateStr} did not match the Date REGEX!`);
             throw new Error(`Invalid date format: ${dateStr}`);
         }
 
@@ -134,6 +147,24 @@ class SiteDetailsTransformer {
         const yearShort = parseInt(match[3], 10);
         const year = 2000 + yearShort;
 
+        return this.buildValidatedDate(dateStr, year, month, day);
+    }
+
+    /**
+     * Builds a Date from its numeric parts and validates that the values are in
+     * range by round-tripping the parsed components.
+     * @param dateStr - The original date string for error messages.
+     * @param year - The full year.
+     * @param month - The zero-based month.
+     * @param day - The day of the month.
+     * @returns The validated Date object.
+     */
+    private static buildValidatedDate(
+        dateStr: string,
+        year: number,
+        month: number,
+        day: number
+    ): Date {
         const date = new Date(Date.UTC(year, month, day));
 
         if (
@@ -170,7 +201,7 @@ class SiteDetailsTransformer {
         }
 
         try {
-            const date = this.parseDDMonYY(trimmed);
+            const date = this.parseDate(trimmed);
             return { status: "released", releasedDate: date };
         } catch {
             logger.error(`Invalid Control Area Released value: ${trimmed}`);

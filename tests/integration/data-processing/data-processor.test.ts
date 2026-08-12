@@ -141,6 +141,21 @@ describe("DataProcessor", () => {
                 expect(result[0].last_reported_detection).toBeInstanceOf(Date);
             });
 
+            it("parses a YYYY-MM-DD last reported detection", async () => {
+                const isoRow = {
+                    ...IOWA_ROW,
+                    lastReportedDetection:
+                        "Last reported detection 2026-07-13.",
+                };
+                const csv = buildMapComparisonsCSV([isoRow]);
+                const result = await processor.processMapComparisonsCSV(csv);
+
+                const date = result[0].last_reported_detection;
+                expect(date.getUTCFullYear()).toBe(2026);
+                expect(date.getUTCMonth()).toBe(6); // July = 6
+                expect(date.getUTCDate()).toBe(13);
+            });
+
             it("parses latitude and longitude as floats", async () => {
                 const csv = buildMapComparisonsCSV([IOWA_ROW]);
                 const result = await processor.processMapComparisonsCSV(csv);
@@ -395,6 +410,16 @@ describe("DataProcessor", () => {
             birdsAffected: "60",
         };
 
+        const ISO_DATE_ROW = {
+            specialId: "White County 01",
+            county: "White",
+            state: "Indiana",
+            production: "Commercial Layer",
+            confirmedDiagnosis: "2026-07-13",
+            controlAreaReleased: "2026-08-02",
+            birdsAffected: "4,600",
+        };
+
         describe("valid input", () => {
             it("returns site_details for a single row with Active status", async () => {
                 const csv = buildExportToCsvCSV([ACTIVE_ROW]);
@@ -425,6 +450,26 @@ describe("DataProcessor", () => {
                 expect(result.site_details).toHaveLength(1);
                 expect(result.site_details[0].status).toBe("na");
                 expect(result.site_details[0].birds_affected).toBe(60);
+            });
+
+            it("parses YYYY-MM-DD dates for confirmed diagnosis and release", async () => {
+                const csv = buildExportToCsvCSV([ISO_DATE_ROW]);
+                const result = await processor.processExportToCsvCSV(csv);
+
+                expect(result.site_details).toHaveLength(1);
+                expect(result.site_details[0].status).toBe("released");
+
+                const confirmed =
+                    result.site_details[0].confirmed_diagnosis_date;
+                expect(confirmed.getUTCFullYear()).toBe(2026);
+                expect(confirmed.getUTCMonth()).toBe(6); // July = 6
+                expect(confirmed.getUTCDate()).toBe(13);
+
+                const released = result.site_details[0]
+                    .control_area_released_date as Date;
+                expect(released.getUTCFullYear()).toBe(2026);
+                expect(released.getUTCMonth()).toBe(7); // August = 7
+                expect(released.getUTCDate()).toBe(2);
             });
 
             it("parses multiple rows correctly", async () => {

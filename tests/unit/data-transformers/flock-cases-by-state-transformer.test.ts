@@ -239,6 +239,30 @@ describe("FlockCasesByStateTransformer", () => {
             expect(date.getUTCDate()).toBe(5);
         });
 
+        it("parses a YYYY-MM-DD date correctly", () => {
+            const result = FlockCasesByStateTransformer.transformData([
+                buildValidRow({
+                    "Last Reported Detection Text":
+                        "Last reported detection 2026-07-13.",
+                }),
+            ]);
+            const date = result[0].last_reported_detection as Date;
+            expect(date.getUTCFullYear()).toBe(2026);
+            expect(date.getUTCMonth()).toBe(6); // July = 6
+            expect(date.getUTCDate()).toBe(13);
+        });
+
+        it("throws when a YYYY-MM-DD date has out of range values", () => {
+            expect(() =>
+                FlockCasesByStateTransformer.transformData([
+                    buildValidRow({
+                        "Last Reported Detection Text":
+                            "Last reported detection 2026-13-01.",
+                    }),
+                ])
+            ).toThrow(/Invalid date value/);
+        });
+
         it("throws when the date string has no recognisable date pattern", () => {
             expect(() =>
                 FlockCasesByStateTransformer.transformData([

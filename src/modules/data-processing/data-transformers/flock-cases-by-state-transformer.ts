@@ -112,11 +112,22 @@ class FlockCasesByStateTransformer {
     }
     /**
      * This takes in a string like "Last reported detection 1/30/2025." and converts it to 1/30/2025
-     * then we restructure it to pass to JavaScript's Date datatype and create a JavaScript Date
+     * then we restructure it to pass to JavaScript's Date datatype and create a JavaScript Date.
+     * Supports both the legacy MM/DD/YYYY pattern and the newer YYYY-MM-DD scheme.
      * @param dateAsString Takes in a string containing the date.
      * @returns Converts the date into a JavaScript Date Object
      */
     private static extractDate(dateAsString: string): Date {
+        const isoMatch = dateAsString.match(/(\d{4})-(\d{2})-(\d{2})/);
+
+        if (isoMatch) {
+            const year = Number(isoMatch[1]);
+            const month = Number(isoMatch[2]);
+            const day = Number(isoMatch[3]);
+
+            return this.buildValidatedDate(dateAsString, year, month - 1, day);
+        }
+
         const match = dateAsString.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
 
         if (!match) {
@@ -124,16 +135,33 @@ class FlockCasesByStateTransformer {
             throw new Error(`Invalid date format: ${dateAsString}`);
         }
 
-        const [, monthStr, dayStr, yearStr] = match.map(Number);
-        const month = Number(monthStr);
-        const day = Number(dayStr);
-        const year = Number(yearStr);
+        const month = Number(match[1]);
+        const day = Number(match[2]);
+        const year = Number(match[3]);
 
-        const date = new Date(Date.UTC(year, month - 1, day));
+        return this.buildValidatedDate(dateAsString, year, month - 1, day);
+    }
+
+    /**
+     * Builds a Date from its numeric parts and validates that the values are in
+     * range by round-tripping the parsed components.
+     * @param dateAsString - The original date string for error messages.
+     * @param year - The full year.
+     * @param month - The zero-based month.
+     * @param day - The day of the month.
+     * @returns The validated Date object.
+     */
+    private static buildValidatedDate(
+        dateAsString: string,
+        year: number,
+        month: number,
+        day: number
+    ): Date {
+        const date = new Date(Date.UTC(year, month, day));
 
         if (
             date.getUTCFullYear() !== year ||
-            date.getUTCMonth() + 1 !== month ||
+            date.getUTCMonth() !== month ||
             date.getUTCDate() !== day
         ) {
             logger.error(`Invalid date value for ${dateAsString}`);
