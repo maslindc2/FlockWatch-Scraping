@@ -144,7 +144,8 @@ describe("DataProcessor", () => {
             it("parses a YYYY-MM-DD last reported detection", async () => {
                 const isoRow = {
                     ...IOWA_ROW,
-                    lastReportedDetection: "Last reported detection 2026-07-13.",
+                    lastReportedDetection:
+                        "Last reported detection 2026-07-13.",
                 };
                 const csv = buildMapComparisonsCSV([isoRow]);
                 const result = await processor.processMapComparisonsCSV(csv);
@@ -458,8 +459,8 @@ describe("DataProcessor", () => {
                 expect(result.site_details).toHaveLength(1);
                 expect(result.site_details[0].status).toBe("released");
 
-                const confirmed = result.site_details[0]
-                    .confirmed_diagnosis_date;
+                const confirmed =
+                    result.site_details[0].confirmed_diagnosis_date;
                 expect(confirmed.getUTCFullYear()).toBe(2026);
                 expect(confirmed.getUTCMonth()).toBe(6); // July = 6
                 expect(confirmed.getUTCDate()).toBe(13);
