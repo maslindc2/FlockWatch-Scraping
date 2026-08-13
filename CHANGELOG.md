@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.0.25](https://github.com/maslindc2/FlockWatch-Scraping/compare/v0.0.23...v0.0.25) (2026-08-13)
+
+
+### Bug Fixes
+
+* update date parsing to support YYYY-MM-DD format in transformers and tests ([c697037](https://github.com/maslindc2/FlockWatch-Scraping/commit/c6970371eb1d285922e11ec18cc4200c1a870d6f))
+
 ## [0.0.24](https://github.com/maslindc2/FlockWatch-Scraping/compare/v0.0.22...v0.0.24) (2026-08-12)
 
 
